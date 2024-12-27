@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - EazySurvey</title>
+    <link rel="stylesheet" href="register-styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="assets/logo.png" alt="EazySurvey">
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About Us</a>
+        </div>
+    </nav>
+
+    <!-- Register Section -->
+    <section class="register-section">
+        <div class="register-container">
+            <h1>Create Account</h1>
+            <form class="register-form" action="register-process.php" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="gender-options">
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="male" required>
+                            Male
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="female">
+                            Female
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" required>
+                        <option value="">Select Role</option>
+                        <option value="baker">Baker</option>
+                        <option value="supervisor">Supervisor</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="register-btn">Register</button>
+                </div>
+
+                <p class="login-link">Already have an account? <a href="login.html">Login here</a></p>
+            </form>
+        </div>
+    </section>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-content">
+        <div class="footer-info">
+            <h3>ROTI SRI BAKERY</h3>
+            <p>Your trusted local bakery in Alor Star, bringing traditional flavors with modern convenience.</p>
+        </div>
+        <div class="footer-social">
+            <a href="#" class="social-dot"></a>
+            <a href="#" class="social-dot"></a>
+            <a href="#" class="social-dot"></a>
+            <a href="#" class="social-dot"></a>
+            <a href="#" class="social-dot"></a>
+        </div>
+    </div>
+    <div class="footer-copyright">
+        <p>© 2024 Roti Sri Bakery | Bakery Management System</p>
+    </div>
+</footer>
+</body>
+</html> 
