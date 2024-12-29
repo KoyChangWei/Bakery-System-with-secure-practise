@@ -56,6 +56,13 @@
     font-size: 1rem;
 }
 
+.register {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    background-color: transparent;
+    border: 1px solid white;
+}
+
 .login-btn {
     width: 100%;
     padding: 0.75rem;
@@ -90,9 +97,9 @@
     text-decoration: underline;
 }
 
-.register-link {
+/* .register-link {
     color: #666;
-}
+} */
 
 .register-link a {
     color: #E91E63;
