@@ -16,13 +16,12 @@ try {
     $stmt->execute();
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
-    
+
     if (!$user) {
         throw new Exception("User not found");
     }
-    
+
     $stmt->close();
-    
 } catch (Exception $e) {
     echo "<script>
             alert('Error: " . $e->getMessage() . "');
@@ -34,6 +33,7 @@ try {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,6 +41,7 @@ try {
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body class="bg-gray-100">
     <div class="flex">
         <!-- Sidebar -->
@@ -53,27 +54,27 @@ try {
                 <div class="text-xl text-center"><?php echo htmlspecialchars($user['name_tbl']); ?></div>
                 <div class="text-sm text-gray-400 text-center">Baker</div>
             </div>
-            
+
             <nav class="mt-6">
-                <a href="#recipe" onclick="showSection('recipe')" 
-                   class="nav-item flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
+                <a href="#recipe" onclick="showSection('recipe')"
+                    class="nav-item flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
                     <i class="fas fa-book w-6"></i>
                     <span>View Recipes</span>
                 </a>
-                <a href="#production" onclick="showSection('production')" 
-                   class="nav-item flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
+                <a href="#production" onclick="showSection('production')"
+                    class="nav-item flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
                     <i class="fas fa-industry w-6"></i>
                     <span>View Schedule</span>
                 </a>
-                <a href="#batch" onclick="showSection('batch')" 
-                   class="nav-item flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
+                <a href="#batch" onclick="showSection('batch')"
+                    class="nav-item flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
                     <i class="fas fa-tasks w-6"></i>
                     <span>Batch Tracking</span>
                 </a>
             </nav>
 
-            <a href="logout.php" onclick="return confirm('Are you sure you want to logout?');" 
-               class="absolute bottom-0 w-full px-6 py-4 bg-pink-600 hover:bg-pink-700 transition-colors flex items-center">
+            <a href="logout.php" onclick="return confirm('Are you sure you want to logout?');"
+                class="absolute bottom-0 w-full px-6 py-4 bg-pink-600 hover:bg-pink-700 transition-colors flex items-center">
                 <i class="fas fa-sign-out-alt w-6"></i>
                 <span>Logout</span>
             </a>
@@ -92,13 +93,13 @@ try {
                 <div class="mb-6 bg-white p-4 rounded-lg shadow">
                     <div class="flex flex-wrap gap-4">
                         <div class="flex-1 min-w-[200px]">
-                            <input type="text" id="recipeSearch" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500" 
-                                   placeholder="Search recipes...">
+                            <input type="text" id="recipeSearch"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                                placeholder="Search recipes...">
                         </div>
                         <div class="flex-1 min-w-[200px]">
-                            <select id="recipeSort" 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500">
+                            <select id="recipeSort"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500">
                                 <option value="">Sort by...</option>
                                 <option value="name">Name (A-Z)</option>
                                 <option value="newest">Newest First</option>
@@ -116,10 +117,10 @@ try {
                         $stmt = $conn->prepare($recipe_sql);
                         $stmt->execute();
                         $recipe_result = $stmt->get_result();
-                        
+
                         if ($recipe_result->num_rows > 0) {
-                            while($row = $recipe_result->fetch_assoc()) {
-                                ?>
+                            while ($row = $recipe_result->fetch_assoc()) {
+                    ?>
                                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                                     <div class="p-6">
                                         <div class="flex justify-between items-start mb-4">
@@ -130,44 +131,44 @@ try {
                                                 Recipe #<?php echo $row['ingredient_id']; ?>
                                             </span>
                                         </div>
-                                        
+
                                         <div class="space-y-4">
                                             <div>
                                                 <h4 class="text-sm font-medium text-gray-500">Quantity Required:</h4>
                                                 <p class="text-gray-800"><?php echo htmlspecialchars($row['quantity_tbl']); ?></p>
                                             </div>
-                                            
+
                                             <div>
                                                 <h4 class="text-sm font-medium text-gray-500">Equipment Needed:</h4>
                                                 <p class="text-gray-800"><?php echo nl2br(htmlspecialchars($row['equipment_tbl'])); ?></p>
                                             </div>
-                                            
+
                                             <div class="truncate">
                                                 <h4 class="text-sm font-medium text-gray-500">Preparation Preview:</h4>
-                                                <p class="text-gray-800"><?php 
-                                                    $preview = substr($row['preparation_step_tbl'], 0, 100);
-                                                    echo nl2br(htmlspecialchars($preview)) . (strlen($row['preparation_step_tbl']) > 100 ? '...' : '');
-                                                ?></p>
+                                                <p class="text-gray-800"><?php
+                                                                            $preview = substr($row['preparation_step_tbl'], 0, 100);
+                                                                            echo nl2br(htmlspecialchars($preview)) . (strlen($row['preparation_step_tbl']) > 100 ? '...' : '');
+                                                                            ?></p>
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="bg-gray-50 px-6 py-3">
                                         <div class="flex justify-between items-center">
-                        
-                                            <button onclick='showRecipeDetail(<?php echo json_encode($row); ?>)' 
-                                                    class="text-pink-600 hover:text-pink-700 font-medium text-sm">
+
+                                            <button onclick='showRecipeDetail(<?php echo json_encode($row); ?>)'
+                                                class="text-pink-600 hover:text-pink-700 font-medium text-sm">
                                                 View Details <i class="fas fa-chevron-right ml-1"></i>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
-                                <?php
+                    <?php
                             }
                         } else {
                             echo "<tr><td colspan='4' class='px-6 py-4 text-center text-gray-500'>No recipes found</td></tr>";
                         }
-                        
+
                         $stmt->close();
                     } catch (Exception $e) {
                         echo "<tr><td colspan='4' class='px-6 py-4 text-center text-red-500'>Error loading recipes: " . $e->getMessage() . "</td></tr>";
@@ -182,7 +183,7 @@ try {
                     <h2 class="text-2xl font-semibold text-gray-800">Production Schedule</h2>
                     <p class="text-gray-600">View current production schedules</p>
                 </div>
-                
+
                 <!-- Production Schedule Content -->
                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
                     <table class="w-full">
@@ -201,9 +202,9 @@ try {
                                 $stmt = $conn->prepare($schedule_sql);
                                 $stmt->execute();
                                 $schedule_result = $stmt->get_result();
-                                
+
                                 if ($schedule_result->num_rows > 0) {
-                                    while($row = $schedule_result->fetch_assoc()) {
+                                    while ($row = $schedule_result->fetch_assoc()) {
                                         echo "<tr class='hover:bg-gray-50'>";
                                         echo "<td class='px-6 py-4'>" . htmlspecialchars($row['order_volumn_tbl']) . "</td>";
                                         echo "<td class='px-6 py-4'>" . htmlspecialchars($row['capacity_tbl']) . "</td>";
@@ -214,7 +215,7 @@ try {
                                 } else {
                                     echo "<tr><td colspan='5' class='px-6 py-4 text-center text-gray-500'>No schedules found</td></tr>";
                                 }
-                                
+
                                 $stmt->close();
                             } catch (Exception $e) {
                                 echo "<tr><td colspan='5' class='px-6 py-4 text-center text-red-500'>Error loading schedules: " . $e->getMessage() . "</td></tr>";
@@ -240,24 +241,24 @@ try {
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Batch Number</label>
                                 <input type="text" name="batch_no_tbl" required
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
                                 <input type="datetime-local" name="startDate_tbl" required
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
                                 <input type="datetime-local" name="endDate_tbl"
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Production Stage</label>
                                 <select name="production_stage_tbl" required
-                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                                     <option value="">Select Stage</option>
                                     <option value="preparation">Preparation</option>
                                     <option value="mixing">Mixing</option>
@@ -269,7 +270,7 @@ try {
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                                 <select name="status_tbl" required
-                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                                     <option value="In Progress">In Progress</option>
                                     <option value="Completed">Completed</option>
                                     <option value="Scheduled">Scheduled</option>
@@ -283,17 +284,17 @@ try {
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">Temperature (°C)</label>
                                         <input type="number" name="temperature" step="0.1"
-                                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">Moisture Content (%)</label>
                                         <input type="number" name="moisture" step="0.1"
-                                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">Weight (g)</label>
                                         <input type="number" name="weight" step="0.1"
-                                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                                     </div>
                                 </div>
                                 <div>
@@ -320,14 +321,14 @@ try {
                                 <div>
                                     <label class="block text-xs text-gray-500 mb-1">Additional Notes</label>
                                     <textarea name="quality_check_tbl" rows="3"
-                                              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500"
-                                              placeholder="Enter any additional quality check notes..."></textarea>
+                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500"
+                                        placeholder="Enter any additional quality check notes..."></textarea>
                                 </div>
                             </div>
                         </div>
                         <div class="flex justify-end">
-                            <button type="submit" 
-                                    class="px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors">
+                            <button type="submit"
+                                class="px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors">
                                 Add Batch
                             </button>
                         </div>
@@ -355,16 +356,16 @@ try {
                                 $stmt = $conn->prepare($batch_sql);
                                 $stmt->execute();
                                 $batch_result = $stmt->get_result();
-                                
+
                                 if ($batch_result->num_rows > 0) {
-                                    while($row = $batch_result->fetch_assoc()) {
-                                        $status_class = match($row['status_tbl']) {
+                                    while ($row = $batch_result->fetch_assoc()) {
+                                        $status_class = match ($row['status_tbl']) {
                                             'Completed' => 'bg-green-100 text-green-800',
                                             'In Progress' => 'bg-yellow-100 text-yellow-800',
                                             'Scheduled' => 'bg-blue-100 text-blue-800',
                                             default => 'bg-gray-100 text-gray-800'
                                         };
-                                        
+
                                         echo "<tr class='hover:bg-gray-50'>";
                                         echo "<td class='px-6 py-4'>" . htmlspecialchars($row['batch_no_tbl']) . "</td>";
                                         echo "<td class='px-6 py-4'>" . date('Y-m-d H:i', strtotime($row['startDate_tbl'])) . "</td>";
@@ -393,9 +394,8 @@ try {
                                 } else {
                                     echo "<tr><td colspan='7' class='px-6 py-4 text-center text-gray-500'>No batch records found</td></tr>";
                                 }
-                                
+
                                 $stmt->close();
-                                
                             } catch (Exception $e) {
                                 echo "<tr><td colspan='7' class='px-6 py-4 text-center text-red-500'>Error loading batch records: " . $e->getMessage() . "</td></tr>";
                             }
@@ -437,22 +437,22 @@ try {
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Batch Number</label>
                         <input type="text" id="edit_batch_no" name="batch_no_tbl" required readonly
-                               class="w-full px-4 py-2 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-pink-500">
+                            class="w-full px-4 py-2 border rounded-lg bg-gray-100 focus:ring-2 focus:ring-pink-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
                         <input type="datetime-local" id="edit_start_date" name="startDate_tbl" required
-                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
                         <input type="datetime-local" id="edit_end_date" name="endDate_tbl"
-                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Production Stage</label>
                         <select id="edit_production_stage" name="production_stage_tbl" required
-                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                             <option value="preparation">Preparation</option>
                             <option value="mixing">Mixing</option>
                             <option value="baking">Baking</option>
@@ -463,13 +463,13 @@ try {
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Quality Check</label>
                         <textarea id="edit_quality_check" name="quality_check_tbl" rows="3" required
-                                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500"
-                                  placeholder="Enter quality check notes..."></textarea>
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500"
+                            placeholder="Enter quality check notes..."></textarea>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                         <select id="edit_status" name="status_tbl" required
-                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                             <option value="In Progress">In Progress</option>
                             <option value="Completed">Completed</option>
                             <option value="Scheduled">Scheduled</option>
@@ -477,12 +477,12 @@ try {
                     </div>
                 </div>
                 <div class="flex justify-end gap-2">
-                    <button type="button" onclick="closeBatchModal()" 
-                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                    <button type="button" onclick="closeBatchModal()"
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
                         Cancel
                     </button>
-                    <button type="submit" 
-                            class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors">
+                    <button type="submit"
+                        class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors">
                         Update Batch
                     </button>
                 </div>
@@ -491,31 +491,40 @@ try {
     </div>
 
     <script>
-    function showSection(sectionName) {
-        document.querySelectorAll('.content-section').forEach(section => {
-            section.classList.add('hidden');
-        });
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('bg-pink-600');
-        });
-        document.getElementById(sectionName + '-section').classList.remove('hidden');
-        document.querySelector(`[href="#${sectionName}"]`).classList.add('bg-pink-600');
-    }
+        function showSection(sectionName) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('bg-pink-600');
+            });
+            document.getElementById(sectionName + '-section').classList.remove('hidden');
+            document.querySelector(`[href="#${sectionName}"]`).classList.add('bg-pink-600');
+        }
 
-    showSection('recipe');
+        showSection('recipe');
 
-    function closeRecipeDetail() {
-        const modal = document.getElementById('recipeDetailModal');
-        modal.classList.add('hidden');
-    }
+        function closeRecipeModal() {
+            const modal = document.getElementById('recipeModal');
+            modal.classList.add('hidden');
+        }
 
-    function showRecipeDetail(recipe) {
-        const modal = document.getElementById('recipeDetailModal');
-        const title = document.getElementById('modalTitle');
-        const content = document.getElementById('modalContent');
+        // Add an event listener to close modals when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('recipeModal');
+            if (event.target === modal) {
+                closeRecipeModal();
+            }
+        };
 
-        title.textContent = recipe.ingredient_name_tbl;
-        content.innerHTML = `
+
+        function showRecipeDetail(recipe) {
+            const modal = document.getElementById('recipeDetailModal');
+            const title = document.getElementById('modalTitle');
+            const content = document.getElementById('modalContent');
+
+            title.textContent = recipe.ingredient_name_tbl;
+            content.innerHTML = `
             <div class="space-y-6">
                 <div class="bg-gray-50 p-4 rounded-lg">
                     <h4 class="font-semibold text-lg mb-2 text-gray-800">Quantity Required</h4>
@@ -551,134 +560,135 @@ try {
             </div>
         `;
 
-        modal.classList.remove('hidden');
-    }
+            modal.classList.remove('hidden');
+        }
 
-    // Add search functionality
-    document.getElementById('recipeSearch').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const recipeCards = document.querySelectorAll('.grid > div');
-        
-        recipeCards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(searchTerm) ? '' : 'none';
+        // Add search functionality
+        document.getElementById('recipeSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const recipeCards = document.querySelectorAll('.grid > div');
+
+            recipeCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
         });
-    });
 
-    // Add sort functionality
-    document.getElementById('recipeSort').addEventListener('change', function(e) {
-        const sortBy = e.target.value;
-        const recipeCards = Array.from(document.querySelectorAll('.grid > div'));
-        const container = document.querySelector('.grid');
-        
-        recipeCards.sort((a, b) => {
-            const nameA = a.querySelector('h3').textContent.toLowerCase();
-            const nameB = b.querySelector('h3').textContent.toLowerCase();
-            
-            switch(sortBy) {
-                case 'name':
-                    return nameA.localeCompare(nameB);
-                case 'newest':
-                    return -1; // Assuming they're already sorted by newest
-                case 'oldest':
-                    return 1;  // Reverse the current order
-                default:
-                    return 0;
+        // Add sort functionality
+        document.getElementById('recipeSort').addEventListener('change', function(e) {
+            const sortBy = e.target.value;
+            const recipeCards = Array.from(document.querySelectorAll('.grid > div'));
+            const container = document.querySelector('.grid');
+
+            recipeCards.sort((a, b) => {
+                const nameA = a.querySelector('h3').textContent.toLowerCase();
+                const nameB = b.querySelector('h3').textContent.toLowerCase();
+
+                switch (sortBy) {
+                    case 'name':
+                        return nameA.localeCompare(nameB);
+                    case 'newest':
+                        return -1; // Assuming they're already sorted by newest
+                    case 'oldest':
+                        return 1; // Reverse the current order
+                    default:
+                        return 0;
+                }
+            });
+
+            container.innerHTML = '';
+            recipeCards.forEach(card => container.appendChild(card));
+        });
+
+        // Add this JavaScript function after your existing scripts
+        function updateBatchStatus(batchId, status) {
+            if (confirm('Are you sure you want to update this batch status?')) {
+                fetch('update_batch.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `batch_id=${batchId}&status=${status}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Batch status updated successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error updating batch status');
+                        }
+                    });
+            }
+        }
+
+        function editBatch(batch) {
+            document.getElementById('edit_batch_id').value = batch.batch_no_tbl;
+            document.getElementById('edit_batch_no').value = batch.batch_no_tbl;
+            document.getElementById('edit_start_date').value = batch.startDate_tbl.slice(0, 16);
+            if (batch.endDate_tbl) {
+                document.getElementById('edit_end_date').value = batch.endDate_tbl.slice(0, 16);
+            }
+            document.getElementById('edit_production_stage').value = batch.production_stage_tbl;
+            document.getElementById('edit_quality_check').value = batch.quality_check_tbl;
+            document.getElementById('edit_status').value = batch.status_tbl;
+
+            document.getElementById('batchEditModal').classList.remove('hidden');
+        }
+
+        function closeBatchModal() {
+            document.getElementById('batchEditModal').classList.add('hidden');
+        }
+
+        function deleteBatch(batchId) {
+            if (confirm('Are you sure you want to delete this batch?')) {
+                fetch('delete_batch.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `batch_id=${batchId}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Batch deleted successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error deleting batch');
+                        }
+                    });
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const batchModal = document.getElementById('batchEditModal');
+            const recipeModal = document.getElementById('recipeDetailModal');
+
+            if (event.target === batchModal) {
+                closeBatchModal();
+            }
+            if (event.target === recipeModal) {
+                closeRecipeDetail();
+            }
+        }
+
+        // Add this after your existing JavaScript
+        // Close modal when clicking outside
+        document.getElementById('recipeDetailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRecipeDetail();
             }
         });
-        
-        container.innerHTML = '';
-        recipeCards.forEach(card => container.appendChild(card));
-    });
 
-    // Add this JavaScript function after your existing scripts
-    function updateBatchStatus(batchId, status) {
-        if(confirm('Are you sure you want to update this batch status?')) {
-            fetch('update_batch.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `batch_id=${batchId}&status=${status}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    alert('Batch status updated successfully!');
-                    location.reload();
-                } else {
-                    alert('Error updating batch status');
-                }
-            });
-        }
-    }
-
-    function editBatch(batch) {
-        document.getElementById('edit_batch_id').value = batch.batch_no_tbl;
-        document.getElementById('edit_batch_no').value = batch.batch_no_tbl;
-        document.getElementById('edit_start_date').value = batch.startDate_tbl.slice(0, 16);
-        if (batch.endDate_tbl) {
-            document.getElementById('edit_end_date').value = batch.endDate_tbl.slice(0, 16);
-        }
-        document.getElementById('edit_production_stage').value = batch.production_stage_tbl;
-        document.getElementById('edit_quality_check').value = batch.quality_check_tbl;
-        document.getElementById('edit_status').value = batch.status_tbl;
-        
-        document.getElementById('batchEditModal').classList.remove('hidden');
-    }
-
-    function closeBatchModal() {
-        document.getElementById('batchEditModal').classList.add('hidden');
-    }
-
-    function deleteBatch(batchId) {
-        if(confirm('Are you sure you want to delete this batch?')) {
-            fetch('delete_batch.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `batch_id=${batchId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    alert('Batch deleted successfully!');
-                    location.reload();
-                } else {
-                    alert('Error deleting batch');
-                }
-            });
-        }
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const batchModal = document.getElementById('batchEditModal');
-        const recipeModal = document.getElementById('recipeDetailModal');
-        
-        if (event.target === batchModal) {
-            closeBatchModal();
-        }
-        if (event.target === recipeModal) {
-            closeRecipeDetail();
-        }
-    }
-
-    // Add this after your existing JavaScript
-    // Close modal when clicking outside
-    document.getElementById('recipeDetailModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeRecipeDetail();
-        }
-    });
-
-    // Close modal with ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !document.getElementById('recipeDetailModal').classList.contains('hidden')) {
-            closeRecipeDetail();
-        }
-    });
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !document.getElementById('recipeDetailModal').classList.contains('hidden')) {
+                closeRecipeDetail();
+            }
+        });
     </script>
 </body>
-</html> 
+
+</html>

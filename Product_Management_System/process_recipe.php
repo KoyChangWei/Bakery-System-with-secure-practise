@@ -4,70 +4,142 @@ require_once 'db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['user_role'] == 'supervisor') {
     try {
-        // Validate required fields
-        $required_fields = ['ingredient_name_tbl', 'quantity_tbl', 'preparation_step_tbl', 'equipment_tbl'];
-        foreach ($required_fields as $field) {
-            if (empty($_POST[$field])) {
-                throw new Exception("$field is required");
-            }
+        $conn->begin_transaction();
+
+        // Debug: Print POST data
+        error_log("POST data: " . print_r($_POST, true));
+
+        // Check if we have all required data
+        if (empty($_POST['recipe_name']) || 
+            empty($_POST['ingredient_name']) || 
+            !is_array($_POST['ingredient_name']) ||
+            empty($_POST['equipment_tbl'])) {
+            throw new Exception("All fields are required");
         }
 
-        $ingredient_id = isset($_POST['ingredient_id']) ? $_POST['ingredient_id'] : null;
-        
-        if ($ingredient_id) {
+        // Handle preparation steps
+        $preparation_steps = [];
+        if (!empty($_POST['preparation_steps']) && is_array($_POST['preparation_steps'])) {
+            foreach ($_POST['preparation_steps'] as $index => $step) {
+                if (!empty(trim($step))) {
+                    $preparation_steps[] = ($index + 1) . ". " . trim($step);
+                }
+            }
+        }
+        $preparation_step_tbl = implode("\n", $preparation_steps);
+
+        if (empty($preparation_step_tbl)) {
+            throw new Exception("At least one preparation step is required");
+        }
+
+        // Insert/Update recipe
+        if (!empty($_POST['recipe_id'])) {
             // Update existing recipe
             $sql = "UPDATE recipe_db SET 
-                    ingredient_name_tbl = ?,
-                    quantity_tbl = ?,
+                    recipe_name = ?,
                     preparation_step_tbl = ?,
                     equipment_tbl = ?,
                     updated_by = ?
-                    WHERE ingredient_id = ?";
-                    
+                    WHERE recipe_id = ?";
+            
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssssii",
-                $_POST['ingredient_name_tbl'],
-                $_POST['quantity_tbl'],
-                $_POST['preparation_step_tbl'],
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $conn->error);
+            }
+            
+            $stmt->bind_param("sssii",
+                $_POST['recipe_name'],
+                $preparation_step_tbl,
                 $_POST['equipment_tbl'],
                 $_SESSION['user_id'],
-                $ingredient_id
+                $_POST['recipe_id']
             );
+            
+            if (!$stmt->execute()) {
+                throw new Exception("Execute failed: " . $stmt->error);
+            }
+            
+            $recipe_id = $_POST['recipe_id'];
+
+            // Delete existing ingredients
+            $delete_sql = "DELETE FROM recipe_ingredients WHERE recipe_id = ?";
+            $delete_stmt = $conn->prepare($delete_sql);
+            $delete_stmt->bind_param("i", $recipe_id);
+            $delete_stmt->execute();
         } else {
             // Insert new recipe
             $sql = "INSERT INTO recipe_db (
-                        ingredient_name_tbl, 
-                        quantity_tbl, 
-                        preparation_step_tbl, 
-                        equipment_tbl, 
+                        recipe_name,
+                        preparation_step_tbl,
+                        equipment_tbl,
                         created_by,
                         updated_by
-                    ) VALUES (?, ?, ?, ?, ?, ?)";
-                    
+                    ) VALUES (?, ?, ?, ?, ?)";
+            
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssssii",
-                $_POST['ingredient_name_tbl'],
-                $_POST['quantity_tbl'],
-                $_POST['preparation_step_tbl'],
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $conn->error);
+            }
+            
+            $stmt->bind_param("sssii",
+                $_POST['recipe_name'],
+                $preparation_step_tbl,
                 $_POST['equipment_tbl'],
                 $_SESSION['user_id'],
                 $_SESSION['user_id']
             );
+            
+            if (!$stmt->execute()) {
+                throw new Exception("Execute failed: " . $stmt->error);
+            }
+            
+            $recipe_id = $conn->insert_id;
+            if (!$recipe_id) {
+                throw new Exception("Failed to get new recipe ID");
+            }
         }
-        
-        // Execute the statement
-        if ($stmt->execute()) {
-            echo "<script>
-                    alert('Recipe " . ($ingredient_id ? "updated" : "saved") . " successfully!');
-                    window.location.href='supervisor_dashboard.php';
-                  </script>";
-        } else {
-            throw new Exception($stmt->error);
+
+        // Insert ingredients
+        $ingredient_sql = "INSERT INTO recipe_ingredients (
+                            recipe_id,
+                            ingredient_name,
+                            quantity,
+                            unit_tbl
+                        ) VALUES (?, ?, ?, ?)";
+        $ingredient_stmt = $conn->prepare($ingredient_sql);
+        if (!$ingredient_stmt) {
+            throw new Exception("Prepare ingredients failed: " . $conn->error);
         }
+
+        // Process each ingredient
+        foreach ($_POST['ingredient_name'] as $key => $ingredient) {
+            if (!empty($ingredient)) {
+                $quantity = $_POST['quantity'][$key];
+                $unit = $_POST['unit'][$key];
+                
+                $ingredient_stmt->bind_param("isds",
+                    $recipe_id,
+                    $ingredient,
+                    $quantity,
+                    $unit
+                );
+                
+                if (!$ingredient_stmt->execute()) {
+                    throw new Exception("Failed to insert ingredient: " . $ingredient_stmt->error);
+                }
+            }
+        }
+
+        $conn->commit();
         
-        $stmt->close();
+        echo "<script>
+                alert('Recipe saved successfully!');
+                window.location.href='supervisor_dashboard.php';
+              </script>";
         
     } catch (Exception $e) {
+        $conn->rollback();
+        error_log("Recipe save error: " . $e->getMessage());
         echo "<script>
                 alert('Error: " . $e->getMessage() . "');
                 window.location.href='supervisor_dashboard.php';
@@ -76,4 +148,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['user_role'] == 'superviso
 }
 
 $conn->close();
-?> 
+?>

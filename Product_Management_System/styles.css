@@ -129,7 +129,7 @@ footer {
 .footer-copyright {
     text-align: center;
     padding-top: 2rem;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Responsive Design */
@@ -160,9 +160,15 @@ footer {
     }
 }
 
+.hidden {
+    display: none;
+}
+
+
 /* Update the logo styles in Navigation section */
 .navbar .logo img {
-    height:70px; /* Adjust this value to change logo size */
+    height: 70px;
+    /* Adjust this value to change logo size */
     width: auto;
     display: block;
-} 
+}

@@ -1,14 +1,16 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
+$host = "localhost:3308";
+$user = "root";
+$password = ""; // Replace with the password you just set
 $dbname = "bakery_db";
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+try {
+    $conn = new mysqli($host, $user,$password, $dbname);
+    if ($conn->connect_error) {
+        throw new Exception("Connection failed: " . $conn->connect_error);
+    }
+    echo "Database connected successfully!";
+} catch (Exception $e) {
+    die("Connection failed: " . $e->getMessage());
 }
-?> 
+?>
