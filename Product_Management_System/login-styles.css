@@ -1,203 +1,209 @@
 /* Import base styles */
 @import 'styles.css';
 
-/* Login specific styles */
+/* Welcome Message Styling */
+.welcome-message {
+    text-align: center;
+    margin-bottom: 2rem; /* Add space below the message */
+    position: absolute; /* Position the message at the top */
+    top: 7rem; /* Adjust the vertical position to ensure it doesn't overlap */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Center alignment correction */
+    z-index: 1; /* Ensure it appears above the background */
+    width: 100%; /* Optional: Ensures consistent centering across the screen */
+}
+
+.welcome-message h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 600;
+    color: var(--text-color);
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    margin: 0; /* Remove default margin for cleaner alignment */
+}
+
+/* Login Section */
 .login-section {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #e91e63, #673ab7);
-    padding: 4rem 1rem;
+    position: relative; /* Enable positioning of the welcome message within this section */
+    min-height: 90vh;
+    background: 
+        linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), /* Adds a semi-transparent overlay */
+        url('assets/bakery_window.jpg') center center / cover no-repeat;
+    padding: 15rem 1rem 4rem; /* Increased top padding to ensure "Welcome Back!" doesn't overlap */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2rem;
 }
 
-.login-container {
-    max-width: 400px;
-    margin: 0 auto;
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+/* General Styling for Containers */
+.login-container,
+.about-bakery-box {
+    flex: 1;
+    max-width: 500px;
+    min-height: 500px; /* Ensure both containers have the same height */
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(50, 50, 50, 0.9));
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    padding: 2.5rem;
+    text-align: center;
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Align content with space in-between */
 }
 
+/* Login Form Headings */
 .login-container h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 0.5rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
 }
 
-.subtitle {
-    text-align: center;
-    color: #666;
+.login-container p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
     margin-bottom: 2rem;
 }
 
-.login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+/* About Us Box Styling */
+.about-bakery-box h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
 }
 
+.about-bakery-box p {
+    font-family: 'Poppins', sans-serif; /* Same font as the typewriter style */
+    font-size: 1.2rem; /* Adjust for visual consistency */
+    font-weight: 300; /* Match the weight of the typewriter */
+    color: var(--text-muted); /* Same color */
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    text-align: center; /* Optional: Align center for elegance */
+}
+
+/* Form Fields */
 .form-group {
+    text-align: left;
     margin-bottom: 1.5rem;
-    width: 100%;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #333;
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
     font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    display: block;
 }
 
-.register {
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    background-color: transparent;
-    border: 1px solid white;
+.form-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--darker-bg);
+    color: var(--text-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
 }
 
+.form-group input:focus {
+    border-color: var(--hover-color);
+    box-shadow: 0 0 10px var(--hover-color);
+    background: rgba(40, 40, 40, 0.9);
+}
+
+/* Submit Button */
 .login-btn {
     width: 100%;
-    padding: 0.75rem;
-    background-color: #E91E63;
-    color: white;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-color);
+    background: var(--accent-color);
     border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 500;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.3s ease;
 }
 
 .login-btn:hover {
-    background-color: #D81B60;
+    background: var(--hover-color);
+    transform: translateY(-3px);
 }
 
+/* Register Link */
 .form-links {
-    text-align: center;
-}
-
-.change-password-link {
-    background: none;
-    border: none;
-    color: #E91E63;
-    font-weight: 500;
-    cursor: pointer;
-    margin-bottom: 1rem;
-}
-
-.change-password-link:hover {
-    text-decoration: underline;
-}
-
-/* .register-link {
-    color: #666;
-} */
-
-.register-link a {
-    color: #E91E63;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.register-link a:hover {
-    text-decoration: underline;
-}
-
-/* Modal styles */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal.hidden {
-    display: none;
-}
-
-.modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 400px;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #666;
-}
-
-.modal-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
     margin-top: 1.5rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
 }
 
-.cancel-btn {
-    padding: 0.75rem 1.5rem;
-    background-color: #e0e0e0;
-    color: #333;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.form-links a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
 }
 
-.submit-btn {
-    padding: 0.75rem 1.5rem;
-    background-color: #E91E63;
+.form-links a:hover {
+    color: #ffcc00; /* Adjust for better visibility */
+    text-decoration: underline;
+}
+
+/* Carousel Container */
+.carousel {
+    position: relative;
+    max-width: 100%;
+    height: 200px;
+    overflow: hidden;
+    margin-top: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Carousel Images */
+.carousel-images {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 100%;
+}
+
+/* Individual Image Styling */
+.carousel-images img {
+    min-width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Navigation Buttons */
+button.prev, button.next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
     color: white;
     border: none;
-    border-radius: 4px;
+    padding: 0.75rem;
+    border-radius: 50%;
     cursor: pointer;
+    z-index: 10;
+    transition: background 0.3s ease;
 }
 
-/* Form validation styles */
-.form-group input:invalid,
-.form-group select:invalid {
-    border-color: #ff4444;
+button.prev:hover, button.next:hover {
+    background: rgba(0, 0, 0, 0.7);
 }
 
-.form-group input:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #e91e63;
-    box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.1);
+button.prev {
+    left: 10px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .login-container {
-        padding: 1.5rem;
-    }
-    
-    .modal-content {
-        margin: 1rem;
-        padding: 1.5rem;
-    }
-} 
+button.next {
+    right: 10px;
+}

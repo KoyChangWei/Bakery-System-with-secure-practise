@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - EazySurvey</title>
+    <title>Roti Sri Bakery - Login</title>
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="login-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -13,103 +16,84 @@
             <img src="assets/logo.png" alt="Roti Sri" class="h-8 w-auto">
         </div>
         <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="about.html">About Us</a>
-            <a href="register.html" class="register">Register</a>
+            <a href="index.html" class="hover-effect">Home</a>
+            <a href="about.html" class="hover-effect">About Us</a>
+            <a href="login.html" class="login-btn pulse-effect">Login</a>
         </div>
     </nav>
 
     <!-- Login Section -->
     <section class="login-section">
+        <div class="welcome-message">
+            <h1>Welcome Back!</h1>
+        </div>
         <div class="login-container">
-            <h1>Welcome Back</h1>
-            <p class="subtitle">Please login to your account</p>
-            
-            <form class="login-form" action="login-process.php" method="POST">
+            <h1 class="gradient-text">Login</h1>
+            <p class="typewriter">Access your personalized bakery dashboard</p>
+            <form class="login-form" action="/login" method="POST">
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
+                    <label for="username">Username or Email</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username or email" required>
                 </div>
-                
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
                 </div>
-
-                <div class="form-group">
-                    <label for="role">Role</label>
-                    <select id="role" name="role" required>
-                        <option value="">Select Role</option>
-                        <option value="supervisor">Supervisor</option>
-                        <option value="baker">Baker</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <button type="submit" class="login-btn">Login</button>
-                </div>
-
-                <div class="form-links">
-                    <p class="register-link">Don't have an account? <a href="register.html">Register</a></p>
-                </div>
+                <button type="submit" class="login-btn">Login</button>
             </form>
+            <div class="form-links">
+                <p>Don't have an account? <a href="register.html" class="hover-effect">Register here</a></p>
+            </div>
+        </div>        
+        <div class="about-bakery-box">
+            <h2 class="gradient-text">About Roti Sri Batery</h2>
+            <p>Since 1980, Roti Sri Bakery has brought joy to your taste buds with premium baked goods. A place where tradition meets innovation.</p>
+            <div class="carousel">
+                <div class="carousel-images">
+                    <img src="assets/bake4.jpg" alt="Fresh Bread">
+                    <img src="assets/bake5.jpg" alt="Bakery Showcase">
+                    <img src="assets/bake6.jpg" alt="Delicious Pastries">
+                </div>
+                <button class="prev" onclick="moveSlide(-1)">&#10094;</button>
+                <button class="next" onclick="moveSlide(1)">&#10095;</button>
+            </div>            
         </div>
     </section>
 
-   <!-- Footer -->
-   <footer>
-    <div class="footer-content">
-        <div class="footer-info">
-            <h3>ROTI SRI BAKERY</h3>
-            <p>Your trusted local bakery in Alor Star, bringing traditional flavors with modern convenience.</p>
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3>ROTI SRI BAKERY</h3>
+                <p>Bringing traditional flavors with modern convenience to Alor Star since 1980.</p>
+            </div>
+            <div class="footer-social">
+                <a href="#" class="social-link" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
         </div>
-        <div class="footer-social">
-            <a href="#" class="social-dot"></a>
-            <a href="#" class="social-dot"></a>
-            <a href="#" class="social-dot"></a>
-            <a href="#" class="social-dot"></a>
-            <a href="#" class="social-dot"></a>
+        <div class="footer-copyright">
+            <p>&copy; 2024 Roti Sri Bakery | Bakery Management System</p>
         </div>
-    </div>
-    <div class="footer-copyright">
-        <p>© 2024 Roti Sri Bakery | Bakery Management System</p>
-    </div>
-</footer>
+    </footer>
 
     <script>
-        function showChangePasswordModal() {
-            document.getElementById('changePasswordModal').classList.remove('hidden');
+        let currentIndex = 0;
+
+        function moveSlide(direction) {
+            const images = document.querySelectorAll('.carousel-images img');
+            currentIndex = (currentIndex + direction + images.length) % images.length;
+            document.querySelector('.carousel-images').style.transform = `translateX(-${currentIndex * 100}%)`;
         }
 
-        function closeChangePasswordModal() {
-            document.getElementById('changePasswordModal').classList.add('hidden');
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('changePasswordModal');
-            if (event.target === modal) {
-                closeChangePasswordModal();
-            }
-        }
-
-        // Close modal with ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeChangePasswordModal();
-            }
-        });
-
-        // Validate password match before submit
-        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
-            const newPassword = this.querySelector('[name="new_password"]').value;
-            const confirmPassword = this.querySelector('[name="confirm_password"]').value;
-            
-            if (newPassword !== confirmPassword) {
-                e.preventDefault();
-                alert('New passwords do not match!');
-            }
-        });
+        setInterval(() => moveSlide(1), 3000); // Auto-slide every 3 seconds
     </script>
 </body>
-</html> 
+</html>

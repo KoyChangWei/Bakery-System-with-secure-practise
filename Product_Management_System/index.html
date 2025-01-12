@@ -5,36 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roti Sri Bakery System</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 </head>
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
-        <div class="logo">
+        <div class="logo animate__animated animate__bounce">
             <img src="assets/logo.png" alt="Roti Sri" class="h-8 w-auto">
         </div>
         <div class="nav-links">
-            <a href="#home">Home</a>
-            <a href="about.html">About Us</a>
-            <a href="login.html" class="login-btn">Login</a>
+            <a href="#home" class="hover-effect">Home</a>
+            <a href="about.html" class="hover-effect">About Us</a>
+            <a href="login.html" class="login-btn pulse-effect">Login</a>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Roti Sri Bakery</h1>
-            <p>A beloved name in Alor Star since the 1980s</p>
-            <a href="register.html" class="register-btn">Join Our Team →</a>
-        </div>
-        <div class="hero-image">
-            <!-- Bakery illustration or image will go here -->
+    <section class="hero" style="background-image: url('assets/bakery_window.jpg'); background-size: cover; background-position: center;">
+        <div class="hero-overlay"></div>
+        <div class="container">
+            <div class="hero-content animate__animated animate__fadeIn">
+                <h1 class="gradient-text">ROTI SRI</h1>
+                <p class="typewriter">A Story of Passion, Tradition & Innovation</p>
+                <div class="fun-facts">
+                    <div class="fact-card">
+                        <img src="assets/bake1.jpg" alt="Fresh Daily Breads" class="card-image">
+                        <div class="card-content">
+                            <h4>Fresh Daily</h4>
+                            <p>Baked fresh every morning with premium ingredients</p>
+                        </div>
+                    </div>
+                    <div class="fact-card">
+                        <img src="assets/bake2.jpg" alt="Baking Process" class="card-image">
+                        <div class="card-content">
+                            <h4>Local Favorite</h4>
+                            <p>Proudly serving our community since 1980</p>
+                        </div>
+                    </div>
+                    <div class="fact-card">
+                        <img src="assets/bake3.jpg" alt="Artisanal Desserts" class="card-image">
+                        <div class="card-content">
+                            <h4>Made with Love</h4>
+                            <p>Crafted with passion and traditional recipes</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="register.html" class="register-btn floating">Join Our Sweet Journey →</a>
+            </div>
         </div>
     </section>
 
     <!-- About Section -->
     <section class="about" id="about">
-        <h2>Our Heritage</h2>
-        <p>Serving the community with freshly baked goods since 1980</p>
+        <h2 class="gradient-text">Our Sweet Heritage</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="year">1980</div>
+                <p>Our journey began in Alor Star</p>
+            </div>
+            <div class="timeline-item">
+                <div class="year">2000</div>
+                <p>Became the city's favorite bakery</p>
+            </div>
+            <div class="timeline-item">
+                <div class="year">2024</div>
+                <p>Embracing the digital age with you!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fun Interactive Section -->
+    <section class="fun-section">
+        <h3>Discover Our Story</h3>
+        <div class="fun-fact-container" id="funFact">
+            Click to reveal a piece of our heritage
+        </div>
     </section>
 
     <!-- Footer -->
@@ -42,19 +89,44 @@
         <div class="footer-content">
             <div class="footer-info">
                 <h3>ROTI SRI BAKERY</h3>
-                <p>Your trusted local bakery in Alor Star, bringing traditional flavors with modern convenience.</p>
+                <p>Bringing traditional flavors with modern convenience to Alor Star since 1980.</p>
             </div>
             <div class="footer-social">
-                <a href="#" class="social-dot"></a>
-                <a href="#" class="social-dot"></a>
-                <a href="#" class="social-dot"></a>
-                <a href="#" class="social-dot"></a>
-                <a href="#" class="social-dot"></a>
+                <a href="#" class="social-link" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
             </div>
         </div>
         <div class="footer-copyright">
-            <p>© 2024 Roti Sri Bakery | Bakery Management System</p>
+            <p>&copy; 2024 Roti Sri Bakery | Bakery Management System</p>
         </div>
     </footer>
+
+    <script>
+        // Fun facts rotation
+        const facts = [
+            "Our oldest recipe is over 40 years old!",
+            "We bake over 1,000 breads daily",
+            "Our secret ingredient is love ",
+            "We've served 3 generations of families",
+            "Our first oven is still displayed in store!"
+        ];
+        
+        const funFactDiv = document.getElementById('funFact');
+        funFactDiv.addEventListener('click', () => {
+            const randomFact = facts[Math.floor(Math.random() * facts.length)];
+            funFactDiv.textContent = randomFact;
+            funFactDiv.classList.add('animate__animated', 'animate__flipInX');
+            setTimeout(() => {
+                funFactDiv.classList.remove('animate__animated', 'animate__flipInX');
+            }, 1000);
+        });
+    </script>
 </body>
-</html> 
+</html>
