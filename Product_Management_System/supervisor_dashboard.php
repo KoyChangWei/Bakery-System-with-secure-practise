@@ -26,6 +26,31 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
         .content-section.active {
             display: block;
         }
+        .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 50;
+        overflow-y: auto; /* Enable vertical scrolling */
+        padding: 1rem;
+    }
+
+    .modal-container {
+        background-color: white;
+        border-radius: 0.5rem;
+        max-width: 42rem;
+        margin: 2rem auto;
+        padding: 1.5rem;
+        position: relative;
+        min-height: min-content;
+    }
+
+    /* Add responsive padding for smaller screens */
+    @media (max-width: 640px) {
+        .modal-overlay {
+            padding: 0.5rem;
+        }
+    }
     </style>
 </head>
 
@@ -44,15 +69,15 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
 
             <!-- Navigation -->
             <nav class="mt-6">
-                <button onclick="switchTab('recipe')" class="nav-item w-full text-left flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
+                <button onclick="switchTab('recipe', event)" class="nav-item w-full text-left flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
                     <i class="fas fa-book w-6"></i>
                     <span>Recipe Management</span>
                 </button>
-                <button onclick="switchTab('production')" class="nav-item w-full text-left flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
+                <button onclick="switchTab('production', event)" class="nav-item w-full text-left flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
                     <i class="fas fa-industry w-6"></i>
                     <span>Production Schedule</span>
                 </button>
-                <button onclick="switchTab('batch')" class="nav-item w-full text-left flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
+                <button onclick="switchTab('batch', event)" class="nav-item w-full text-left flex items-center px-6 py-3 hover:bg-gray-700 transition-colors">
                     <i class="fas fa-tasks w-6"></i>
                     <span>Batch Reports</span>
                 </button>
@@ -66,7 +91,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
         </div>
 
         <!-- Main Content -->
-        <div class="ml-64 flex-1 p-8">
+        <div class="ml-64 flex-1 p-4">
             <!-- Recipe Section -->
             <div id="recipe-tab" class="content-section active">
                 <h2 class="text-2xl font-semibold mb-6">Recipe Management</h2>
@@ -141,7 +166,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
             <!-- Production Section -->
             <div id="production-tab" class="content-section">
                 <h2 class="text-2xl font-semibold mb-6">Production Schedule</h2>
-                <button type="button" id="addScheduleBtn" onclick="showScheduleModal()"
+                <button onclick="showScheduleModal()"
                     class="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition-colors flex items-center gap-2 mb-6">
                     <i class="fas fa-plus"></i> Add New Schedule
                 </button>
@@ -169,10 +194,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
                                     e.equipment_name,
                                     e.status as equipment_status,
                                     GROUP_CONCAT(DISTINCT a.name_tbl) as staff_names,
-                                    (SELECT CONCAT(ri.ingredient_name, ': ', (ri.quantity * p.order_volume), ' ', ri.unit_tbl)
+                                    (SELECT GROUP_CONCAT(CONCAT(ri.ingredient_name, ': ', (ri.quantity * p.order_volume), ' ', ri.unit_tbl) SEPARATOR ', ')
                                      FROM recipe_ingredients ri 
-                                     WHERE ri.recipe_id = p.recipe_id 
-                                     LIMIT 1) as total_ingredients
+                                     WHERE ri.recipe_id = p.recipe_id) as total_ingredients
                                     FROM production_db p
                                     LEFT JOIN recipe_db r ON p.recipe_id = r.recipe_id
                                     LEFT JOIN equipment_status e ON p.equipment_id = e.equipment_id
@@ -182,59 +206,146 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
 
                             $result = $conn->query($sql);
 
-                            while ($row = $result->fetch_assoc()) {
-                                echo "<tr class='border-b hover:bg-gray-50'>";
-                                echo "<td class='py-2 px-4'>{$row['recipe_name']}</td>";
-                                echo "<td class='py-2 px-4'>{$row['production_date']}</td>";
-                                echo "<td class='py-2 px-4'>{$row['order_volume']} units</td>";
-                                echo "<td class='py-2 px-4'>{$row['capacity']} units/hour</td>";
-                                echo "<td class='py-2 px-4'>{$row['staff_names']}</td>";
-                                echo "<td class='py-2 px-4'>{$row['equipment_name']}</td>";
-                                echo "<td class='py-2 px-4'>";
-                                if ($row['equipment_status'] == 'Available') {
-                                    echo "<span class='text-green-600'>Available</span>";
-                                } else {
-                                    echo "<span class='text-blue-600'>Scheduled</span>";
+                            if ($result->num_rows > 0) {
+                                while ($row = $result->fetch_assoc()) {
+                                    echo "<tr class='border-b hover:bg-gray-50'>";
+                                    echo "<td class='py-2 px-4'>" . htmlspecialchars($row['recipe_name']) . "</td>";
+                                    echo "<td class='py-2 px-4'>" . htmlspecialchars($row['production_date']) . "</td>";
+                                    echo "<td class='py-2 px-4'>" . htmlspecialchars($row['order_volume']) . " units</td>";
+                                    echo "<td class='py-2 px-4'>" . htmlspecialchars($row['capacity']) . " units/hour</td>";
+                                    echo "<td class='py-2 px-4'>" . htmlspecialchars($row['staff_names']) . "</td>";
+                                    echo "<td class='py-2 px-4'>" . htmlspecialchars($row['equipment_name']) . "</td>";
+                                    echo "<td class='py-2 px-4'>";
+                                    echo $row['equipment_status'] == 'Available' 
+                                        ? "<span class='text-green-600'>Available</span>" 
+                                        : "<span class='text-blue-600'>Scheduled</span>";
+                                    echo "</td>";
+                                    echo "<td class='py-2 px-4'>" . htmlspecialchars($row['total_ingredients']) . "</td>";
+                                    echo "<td class='py-2 px-4 flex gap-2'>";
+                                    echo "<button onclick='editSchedule(" . $row['production_id'] . ")' class='text-blue-600 hover:text-blue-800'><i class='fas fa-edit'></i></button>";
+                                    echo "<button onclick='deleteSchedule(" . $row['production_id'] . ")' class='text-red-600 hover:text-red-800'><i class='fas fa-trash'></i></button>";
+                                    echo "</td>";
+                                    echo "</tr>";
                                 }
-                                echo "</td>";
-                                echo "<td class='py-2 px-4'>{$row['total_ingredients']}</td>";
-                                echo "<td class='py-2 px-4 flex gap-2'>";
-                                echo "<button onclick='editSchedule({$row['production_id']})' class='text-blue-600 hover:text-blue-800'><i class='fas fa-edit'></i></button>";
-                                echo "<button onclick='deleteSchedule({$row['production_id']})' class='text-red-600 hover:text-red-800'><i class='fas fa-trash'></i></button>";
-                                echo "</td>";
-                                echo "</tr>";
+                            } else {
+                                echo "<tr><td colspan='9' class='py-4 px-4 text-center text-gray-500'>No production schedules found</td></tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+</div>
+
+<!-- Batch Section -->
+            <div id="batch-tab" class="content-section">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-800">Batch Reports</h2>
+                    <p class="text-gray-600">View and manage production batch reports</p>
+                </div>
+
+                <!-- Batch Reports Table -->
+                <div class="bg-white rounded-lg shadow-md overflow-x-auto w-full"> <!-- Added w-full and kept overflow-x-auto -->
+                    <table class="w-full whitespace-nowrap"> <!-- Changed to full width and better text wrapping -->
+                        <thead class="bg-gray-800 text-white">
+                            <tr>
+                                <th class="w-1/12 px-4 py-3 text-left text-sm font-semibold">Batch No</th>
+                                <th class="w-1/12 px-4 py-3 text-left text-sm font-semibold">Start Date</th>
+                                <th class="w-1/12 px-4 py-3 text-left text-sm font-semibold">End Date</th>
+                                <th class="w-2/12 px-4 py-3 text-left text-sm font-semibold">Workers</th>
+                                <th class="w-1/12 px-4 py-3 text-left text-sm font-semibold">Stage</th>
+                                <th class="w-3/12 px-4 py-3 text-left text-sm font-semibold">Quality Check</th>
+                                <th class="w-2/12 px-4 py-3 text-left text-sm font-semibold">Quantities</th>
+                                <th class="w-1/12 px-4 py-3 text-left text-sm font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <?php
+                            try {
+                                $batch_sql = "SELECT b.*, 
+                                              r.worker_count, 
+                                              r.worker_names, 
+                                              r.temperature, 
+                                              r.moisture, 
+                                              r.weight, 
+                                              r.target_quantity, 
+                                              r.actual_quantity, 
+                                              r.defect_count 
+                                              FROM batch_db b 
+                                              LEFT JOIN batch_reports r ON b.batch_no_tbl = r.batch_no 
+                                              ORDER BY b.startDate_tbl DESC";
+                                $stmt = $conn->prepare($batch_sql);
+                                $stmt->execute();
+                                $batch_result = $stmt->get_result();
+                                
+                                if ($batch_result->num_rows > 0) {
+                                    while($row = $batch_result->fetch_assoc()) {
+                                        $status_class = match($row['status_tbl']) {
+                                            'Completed' => 'bg-green-100 text-green-800',
+                                            'In Progress' => 'bg-yellow-100 text-yellow-800',
+                                            'Scheduled' => 'bg-blue-100 text-blue-800',
+                                            default => 'bg-gray-100 text-gray-800'
+                                        };
+                                        
+                                        echo "<tr class='hover:bg-gray-50'>";
+                                        echo "<td class='px-4 py-3 text-sm font-medium text-gray-900'>" . htmlspecialchars($row['batch_no_tbl']) . "</td>";
+                                        echo "<td class='px-4 py-3 text-sm'>" . date('Y-m-d<\b\r>H:i', strtotime($row['startDate_tbl'])) . "</td>";
+                                        echo "<td class='px-4 py-3 text-sm'>" . ($row['endDate_tbl'] ? date('Y-m-d<\b\r>H:i', strtotime($row['endDate_tbl'])) : '-') . "</td>";
+                                        
+                                        echo "<td class='px-4 py-3'>
+                                            <div class='text-sm space-y-1'>
+                                                <div class='font-medium'>Count: " . htmlspecialchars($row['worker_count']) . "</div>
+                                                <div class='text-gray-600'>Names: " . htmlspecialchars($row['worker_names']) . "</div>
+                                            </div>
+                                        </td>";
+                                        
+                                        echo "<td class='px-4 py-3 text-sm'>" . ucwords(htmlspecialchars($row['production_stage_tbl'])) . "</td>";
+                                       
+                                        echo "<td class='px-4 py-3'>
+                                            <div class='text-sm space-y-1'>
+                                                <div class='grid grid-cols-2 gap-2'>
+                                                    <div>Temp: " . htmlspecialchars($row['temperature']) . "°C</div>
+                                                    <div>Moisture: " . htmlspecialchars($row['moisture']) . "%</div>
+                                                    <div>Weight: " . htmlspecialchars($row['weight']) . "g</div>
+                                                </div>
+                                                <div class='text-gray-600'>Notes: " . nl2br(htmlspecialchars($row['quality_check_tbl'])) . "</div>
+                                            </div>
+                                        </td>";
+                                        
+                                        echo "<td class='px-4 py-3'>
+                                            <div class='text-sm space-y-1'>
+                                                <div class='text-green-600'>Target: " . htmlspecialchars($row['target_quantity']) . "</div>
+                                                <div class='text-blue-600'>Actual: " . htmlspecialchars($row['actual_quantity']) . "</div>
+                                                <div class='text-red-600'>Defects: " . htmlspecialchars($row['defect_count']) . "</div>
+                                            </div>
+                                        </td>";
+                                        
+                                        echo "<td class='px-4 py-3'>
+                                                <span class='inline-flex px-2 py-1 rounded-full text-xs font-medium {$status_class}'>
+                                                    {$row['status_tbl']}
+                                                </span>
+                                              </td>";
+                                        echo "</tr>";
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='8' class='px-4 py-3 text-center text-gray-500'>No batch records found</td></tr>";
+                                }
+                                
+                                $stmt->close();
+                                
+                            } catch (Exception $e) {
+                                echo "<tr><td colspan='8' class='px-4 py-3 text-center text-red-500'>Error loading batch records: " . $e->getMessage() . "</td></tr>";
                             }
                             ?>
                         </tbody>
                     </table>
                 </div>
             </div>
-
-            <!-- Batch Section -->
-            <div id="batch-tab" class="content-section">
-                <h2 class="text-2xl font-semibold mb-6">Batch Reports</h2>
-                <!-- Your existing batch content -->
-            </div>
-
-            <!-- Production Scheduling Section -->
-            <div id="production-section" class="content-section hidden">
-                <h2 class="text-2xl font-semibold mb-6">Production Scheduling</h2>
-                <button onclick="showScheduleModal()"
-                    class="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition-colors flex items-center gap-2 mb-6">
-                    <i class="fas fa-plus"></i> Add New Schedule
-                </button>
-
-                <!-- Production Schedule Table -->
-                <div class="bg-white rounded-lg shadow overflow-hidden">
-                    <!-- Your existing table code -->
-                </div>
-            </div>
         </div>
-    </div>
 
     <!-- Recipe Modal -->
-    <div id="recipeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-        <div class="bg-white rounded-lg max-w-2xl mx-auto mt-20 p-6">
+    <div id="recipeModal" class="modal-overlay hidden">
+    <div class="modal-container">
+     
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-semibold">Add/Edit Recipe</h3>
                 <button onclick="closeRecipeModal()" class="text-gray-500 hover:text-gray-700">
@@ -321,8 +432,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
     </div>
 
     <!-- Schedule Modal -->
-    <div id="scheduleModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-        <div class="bg-white rounded-lg max-w-2xl mx-auto mt-20 p-6">
+    <div id="scheduleModal" class="modal-overlay hidden">
+    <div class="modal-container">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-semibold">Add/Edit Production Schedule</h3>
                 <button onclick="closeScheduleModal()" class="text-gray-500 hover:text-gray-700">
@@ -413,7 +524,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
 </div>
 
     <script>
-        function switchTab(tabName) {
+        function switchTab(tabName, event) {
             // Hide all tabs
             document.querySelectorAll('.content-section').forEach(tab => {
                 tab.style.display = 'none';
@@ -435,6 +546,68 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
         document.addEventListener('DOMContentLoaded', function() {
             switchTab('recipe');
         });
+
+        // Function to show the schedule modal with the fetched data
+function showScheduleModal(schedule) {
+    // Populate the modal fields with the schedule data
+    document.getElementById('schedule_id').value = schedule.production_id;
+    document.getElementById('product').value = schedule.recipe_id;
+    document.getElementById('production_date').value = schedule.production_date;
+    document.getElementById('order_volume').value = schedule.order_volume;
+    document.getElementById('capacity').value = schedule.capacity;
+    document.getElementById('equipment_id').value = schedule.equipment_id;
+
+    // Populate staff availability
+    const staffContainer = document.getElementById('staff-container');
+    staffContainer.innerHTML = ''; // Clear existing staff
+    const staffIds = schedule.staff_availability.split(',');
+    staffIds.forEach(staffId => {
+        const select = createStaffSelect();
+        select.value = staffId;
+        staffContainer.appendChild(select);
+    });
+
+    // Show the modal
+    document.getElementById('scheduleModal').classList.remove('hidden');
+}
+
+// Function to edit schedule
+function editSchedule(scheduleId) {
+    fetch(`get_schedule.php?id=${scheduleId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showScheduleModal(data.schedule);
+            } else {
+                alert('Failed to load schedule data');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to load schedule data');
+        });
+}
+        // Function to delete schedule
+        function deleteSchedule(scheduleId) {
+            if (confirm('Are you sure you want to delete this schedule?')) {
+                fetch(`delete_schedule.php?schedule_id=${scheduleId}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Schedule deleted successfully');
+                        window.location.reload();
+                    } else {
+                        alert('Failed to delete schedule');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to delete schedule');
+                });
+            }
+        }
 
         // Simplified equipment handling
         async function checkEquipmentAvailability(selectedEquipment = null, recipeId = null) {
@@ -563,7 +736,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
                     showScheduleModal();
                 };
             }
-
             // Add submit handler for schedule form
             const scheduleForm = document.getElementById('scheduleForm');
             if (scheduleForm) {
@@ -859,55 +1031,57 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
         }
 
     function showScheduleModal(schedule = null) {
-            const modal = document.getElementById('scheduleModal');
-            const staffContainer = document.getElementById('staff-container');
+        const modal = document.getElementById('scheduleModal');
+        const staffContainer = document.getElementById('staff-container');
 
-            if (!modal || !staffContainer) {
-                console.error("Modal or staff container not found");
-                return;
-            }
+        // Show the modal
+        modal.classList.remove('hidden');
 
-            modal.classList.remove('hidden');
-
-            // Reset the form
+        // Reset the form
         const form = document.getElementById('scheduleForm');
-            if (form) form.reset();
+        if (form) form.reset();
 
-            // Create initial staff dropdown
-            const staffSelect = createStaffSelect();
-            staffContainer.innerHTML = ''; // Clear existing content
-            staffContainer.appendChild(staffSelect);
+        // Create initial staff dropdown
+        const staffSelect = createStaffSelect();
+        staffContainer.innerHTML = ''; // Clear existing content
+        staffContainer.appendChild(staffSelect);
 
-            // If editing an existing schedule
+        // If editing an existing schedule
         if (schedule) {
-                document.getElementById('schedule_id').value = schedule.schedule_id || '';
-                document.getElementById('product').value = schedule.product_id || '';
-                document.getElementById('production_date').value = schedule.production_date || '';
-                document.getElementById('order_volume').value = schedule.order_volume || '';
+            document.getElementById('schedule_id').value = schedule.schedule_id || '';
+            document.getElementById('product').value = schedule.product_id || '';
+            document.getElementById('production_date').value = schedule.production_date || '';
+            document.getElementById('order_volume').value = schedule.order_volume || '';
+            document.getElementById('capacity').value = schedule.capacity || '';
+            document.getElementById('equipment_id').value = schedule.equipment_id || '';
 
-                if (schedule.staff_names) {
-                    const staffMembers = schedule.staff_names.split(',').map(s => s.trim());
-                    staffMembers.forEach((staff, index) => {
-                        if (index > 0) addStaff();
-                    });
-                }
+            if (schedule.staff_ids) {
+                const staffMembers = schedule.staff_ids.split(',').map(s => s.trim());
+                staffMembers.forEach((staff, index) => {
+                    if (index > 0) addStaff();
+                    const staffSelects = document.querySelectorAll('#staff-container select');
+                    staffSelects[index].value = staff;
+                });
             }
         }
+    }
 
-        function addStaff() {
-            const container = document.getElementById('staff-container');
-            if (!container) {
-                return;
-            }
-
-            // Clone the first select element
-            const firstSelect = container.querySelector('select');
-            if (firstSelect) {
-                const newSelect = firstSelect.cloneNode(true);
-                newSelect.value = ''; // Reset selection
-                container.appendChild(newSelect);
-            }
+    function addStaff() {
+        const container = document.getElementById('staff-container');
+        if (!container) {
+            return;
         }
+
+        // Clone the first select element
+        const firstSelect = container.querySelector('select');
+        if (firstSelect) {
+            const newSelect = firstSelect.cloneNode(true);
+            newSelect.value = ''; // Reset selection
+            container.appendChild(newSelect);
+        }
+    }
+
+        
 
         function deleteSchedule(scheduleId) {
             if (confirm('Are you sure you want to delete this schedule?')) {

@@ -1,8 +1,8 @@
 <?php
-$host = "localhost:3308";
+$host = "localhost:3307";
 $user = "root";
 $password = ""; // Replace with the password you just set
-$dbname = "bakery_db";
+$dbname = "bakery_db(4)";
 
 try {
     $conn = new mysqli($host, $user,$password, $dbname);

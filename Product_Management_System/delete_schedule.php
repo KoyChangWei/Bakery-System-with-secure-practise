@@ -2,14 +2,14 @@
 session_start();
 require_once 'db_connect.php';
 
-if (isset($_GET['id']) && $_SESSION['user_role'] == 'supervisor') {
+if (isset($_GET['schedule_id']) && $_SESSION['user_role'] == 'supervisor') {
     try {
         // Prepare the DELETE statement
         $sql = "DELETE FROM production_db WHERE production_id = ?";
         $stmt = $conn->prepare($sql);
         
         // Bind parameter
-        $stmt->bind_param("i", $_GET['id']);
+        $stmt->bind_param("i", $_GET['schedule_id']);
         
         // Execute the statement
         if ($stmt->execute()) {
@@ -32,4 +32,4 @@ if (isset($_GET['id']) && $_SESSION['user_role'] == 'supervisor') {
 }
 
 $conn->close();
-?> 
+?>

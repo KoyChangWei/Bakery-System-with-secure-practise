@@ -2,59 +2,54 @@
 session_start();
 require_once 'db_connect.php';
 
+// Enable error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['user_role'] == 'baker') {
     try {
-        // Prepare the INSERT statement
-        $sql = "INSERT INTO batch_db (
-                    batch_no_tbl,
-                    startDate_tbl,
-                    endDate_tbl,
-                    production_stage_tbl,
-                    quality_check_tbl,
-                    status_tbl
-                ) VALUES (?, ?, ?, ?, ?, ?)";
-        
-        $stmt = $conn->prepare($sql);
-        
-        // Process quality check data
-        $temperature = isset($_POST['temperature']) ? floatval($_POST['temperature']) : null;
-        $moisture = isset($_POST['moisture']) ? floatval($_POST['moisture']) : null;
-        $weight = isset($_POST['weight']) ? floatval($_POST['weight']) : null;
-        $visual_checks = isset($_POST['visual_checks']) ? implode(", ", $_POST['visual_checks']) : '';
-        
-        // Combine quality check data
-        $quality_check = "Temperature: {$temperature}°C\n" .
-                        "Moisture: {$moisture}%\n" .
-                        "Weight: {$weight}g\n" .
-                        "Visual Checks: {$visual_checks}\n" .
-                        "Notes: " . ($_POST['quality_check_tbl'] ?? '');
-
-        // Handle end date being NULL
-        $end_date = !empty($_POST['endDate_tbl']) ? $_POST['endDate_tbl'] : null;
-        
-        // Bind parameters
+        $conn->begin_transaction();
+    
+        // Insert into batch_db
+        $batch_sql = "INSERT INTO batch_db (batch_no_tbl, startDate_tbl, endDate_tbl, production_stage_tbl, quality_check_tbl, status_tbl) 
+                      VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($batch_sql);
         $stmt->bind_param("ssssss", 
             $_POST['batch_no_tbl'],
             $_POST['startDate_tbl'],
-            $end_date,
+            $_POST['endDate_tbl'],
             $_POST['production_stage_tbl'],
-            $quality_check,
+            $_POST['quality_check_tbl'],
             $_POST['status_tbl']
         );
-        
-        // Execute the statement
-        if ($stmt->execute()) {
-            echo "<script>
-                    alert('Batch tracking record added successfully!');
-                    window.location.href='baker_dashboard.php#batch';
-                  </script>";
-        } else {
-            throw new Exception($stmt->error);
-        }
-        
-        $stmt->close();
-        
+        $stmt->execute();
+    
+        // Insert into batch_reports
+        $report_sql = "INSERT INTO batch_reports (batch_no, worker_count, worker_names, temperature, moisture, weight, target_quantity, actual_quantity, defect_count) 
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($report_sql);
+        $stmt->bind_param("sissssiii",
+            $_POST['batch_no_tbl'],
+            $_POST['worker_count'],
+            $_POST['worker_names'],
+            $_POST['temperature'],
+            $_POST['moisture'],
+            $_POST['weight'],
+            $_POST['target_quantity'],
+            $_POST['actual_quantity'],
+            $_POST['defect_count']
+        );
+        $stmt->execute();
+    
+        $conn->commit();
+        echo "<script>
+                alert('Batch tracking record added successfully!');
+                window.location.href='baker_dashboard.php#batch';
+              </script>";
+    
     } catch (Exception $e) {
+        $conn->rollback();
         echo "<script>
                 alert('Error: " . $e->getMessage() . "');
                 window.location.href='baker_dashboard.php#batch';
@@ -63,4 +58,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['user_role'] == 'baker') {
 }
 
 $conn->close();
-?> 
+?>
