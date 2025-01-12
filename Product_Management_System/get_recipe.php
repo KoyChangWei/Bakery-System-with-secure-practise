@@ -1,5 +1,7 @@
 <?php
+ob_start();
 require_once 'db_connect.php';
+ob_clean();
 header('Content-Type: application/json');
 
 if (!isset($_GET['recipe_id'])) {
@@ -8,18 +10,18 @@ if (!isset($_GET['recipe_id'])) {
 }
 
 try {
-    // Get recipe details including ingredients and equipment
+    // Get recipe details including ingredients
     $sql = "SELECT r.*, 
             GROUP_CONCAT(
                 CONCAT(ri.ingredient_name, '|', ri.quantity, '|', ri.unit_tbl)
                 SEPARATOR ';;'
             ) as ingredients_data,
-            e.status as equipment_status
+            e.equipment_id, 
+            e.equipment_name
             FROM recipe_db r
             LEFT JOIN recipe_ingredients ri ON r.recipe_id = ri.recipe_id
-            LEFT JOIN equipment_status e ON r.equipment_tbl = e.equipment_name
-            WHERE r.recipe_id = ?
-            GROUP BY r.recipe_id";
+            LEFT JOIN equipment_status e ON e.equipment_name = r.equipment_tbl
+            WHERE r.recipe_id = ?";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $_GET['recipe_id']);
@@ -31,54 +33,34 @@ try {
         throw new Exception("Recipe not found");
     }
 
-    // Calculate ingredients for order volume if provided
-    $order_volume = $_GET['volume'] ?? 1;
+    // Process ingredients
     $ingredients = [];
-    
     if ($recipe['ingredients_data']) {
         foreach (explode(';;', $recipe['ingredients_data']) as $ingredient) {
             list($name, $qty, $unit) = explode('|', $ingredient);
             $ingredients[] = [
                 'ingredient_name' => $name,
-                'quantity' => $qty * $order_volume,
+                'quantity' => $qty,
                 'unit' => $unit
             ];
         }
     }
 
-    // Get available staff (bakers)
-    $staff_sql = "SELECT admin_id, name_tbl 
-                  FROM admin_db 
-                  WHERE role_tbl = 'baker' 
-                  AND admin_id NOT IN (
-                      SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(staff_availability, ',', n.n), ',', -1) as staff_id
-                      FROM production_db 
-                      WHERE production_date = ? 
-                  )";
-    
-    $staff_stmt = $conn->prepare($staff_sql);
-    $production_date = $_GET['production_date'] ?? date('Y-m-d');
-    $staff_stmt->bind_param("s", $production_date);
-    $staff_stmt->execute();
-    $available_staff = $staff_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
-    // Calculate production capacity based on equipment and staff
-    $capacity = min(
-        $order_volume * 1.2, // 20% buffer
-        count($available_staff) * 100 // Example: each staff can handle 100 units
-    );
+    // Get production rate
+    $production_rate = 100; // Default value
+    $capacity = $production_rate . ' units/hour';
 
     echo json_encode([
         'success' => true,
         'recipe' => [
             'recipe_id' => $recipe['recipe_id'],
             'recipe_name' => $recipe['recipe_name'],
-            'equipment' => $recipe['equipment_tbl'],
-            'equipment_status' => $recipe['equipment_status'],
-            'ingredients' => $ingredients,
-            'available_staff' => $available_staff,
-            'suggested_capacity' => $capacity
-        ]
+            'equipment_id' => $recipe['equipment_id'],
+            'equipment_name' => $recipe['equipment_name'],
+            'ingredients' => $ingredients
+        ],
+        'production_rate' => $production_rate,
+        'production_capacity' => $capacity
     ]);
 
 } catch (Exception $e) {
@@ -87,4 +69,6 @@ try {
         'message' => $e->getMessage()
     ]);
 }
+
+$conn->close();
 ?>

@@ -70,26 +70,26 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
             <!-- Recipe Section -->
             <div id="recipe-tab" class="content-section active">
                 <h2 class="text-2xl font-semibold mb-6">Recipe Management</h2>
-                <button onclick="showRecipeModal()"
+        <button onclick="showRecipeModal()"
                     class="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition-colors flex items-center gap-2 mb-6">
-                    <i class="fas fa-plus"></i>
-                    Add New Recipe
-                </button>
+            <i class="fas fa-plus"></i>
+            Add New Recipe
+        </button>
 
-                <!-- Recipe Table -->
-                <div class="bg-white rounded-lg shadow overflow-hidden">
-                    <table class="w-full">
-                        <thead class="bg-gray-800 text-white">
-                            <tr>
-                                <th class="px-6 py-3 text-left">Recipe Name</th>
-                                <th class="px-6 py-3 text-left">Ingredients</th>
-                                <th class="px-6 py-3 text-left">Preparation Steps</th>
-                                <th class="px-6 py-3 text-left">Equipment</th>
-                                <th class="px-6 py-3 text-left">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <?php
+    <!-- Recipe Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-gray-800 text-white">
+                <tr>
+                    <th class="px-6 py-3 text-left">Recipe Name</th>
+                    <th class="px-6 py-3 text-left">Ingredients</th>
+                    <th class="px-6 py-3 text-left">Preparation Steps</th>
+                    <th class="px-6 py-3 text-left">Equipment</th>
+                    <th class="px-6 py-3 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php
                             $recipe_sql = "SELECT r.*, 
                                    GROUP_CONCAT(CONCAT(ri.ingredient_name, '|', ri.quantity, '|', ri.unit_tbl) SEPARATOR ';;') as ingredient_data
                             FROM recipe_db r 
@@ -100,8 +100,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
                             $stmt->execute();
                             $recipe_result = $stmt->get_result();
 
-                            if ($recipe_result->num_rows > 0) {
-                                while ($row = $recipe_result->fetch_assoc()) {
+                if ($recipe_result->num_rows > 0) {
+                    while ($row = $recipe_result->fetch_assoc()) {
                                     $ingredients_html = '';
                                     if ($row['ingredient_data']) {
                                         $ingredients = explode(';;', $row['ingredient_data']);
@@ -110,31 +110,31 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
                                             $ingredients_html .= "<div>{$name} - {$quantity} {$unit}</div>";
                                         }
                                     }
-
-                                    echo "<tr class='hover:bg-gray-50'>";
-                                    echo "<td class='px-6 py-4'>" . htmlspecialchars($row['recipe_name']) . "</td>";
+                        
+                        echo "<tr class='hover:bg-gray-50'>";
+                        echo "<td class='px-6 py-4'>" . htmlspecialchars($row['recipe_name']) . "</td>";
                                     echo "<td class='px-6 py-4'>" . $ingredients_html . "</td>";
                                     echo "<td class='px-6 py-4'>" . nl2br(htmlspecialchars($row['preparation_step_tbl'])) . "</td>";
                                     echo "<td class='px-6 py-4'>" . htmlspecialchars($row['equipment_tbl']) . "</td>";
-                                    echo "<td class='px-6 py-4'>
-                                            <button onclick='editRecipe(" . json_encode($row) . ")' 
+                        echo "<td class='px-6 py-4'>
+                                <button onclick='editRecipe(" . json_encode($row) . ")' 
                                                     data-recipe='" . htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8') . "'
-                                                    class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition-colors mr-2'>
-                                                <i class='fas fa-edit'></i> Edit
-                                            </button>
-                                            <button onclick='deleteRecipe(" . $row['recipe_id'] . ")' 
-                                                    class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors'>
-                                                <i class='fas fa-trash'></i> Delete
-                                            </button>
-                                          </td>";
-                                    echo "</tr>";
-                                }
-                            } else {
-                                echo "<tr><td colspan='5' class='px-6 py-4 text-center text-gray-500'>No recipes found</td></tr>";
-                            }
-                            ?>
-                        </tbody>
-                    </table>
+                                        class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition-colors mr-2'>
+                                    <i class='fas fa-edit'></i> Edit
+                                </button>
+                                <button onclick='deleteRecipe(" . $row['recipe_id'] . ")' 
+                                        class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors'>
+                                    <i class='fas fa-trash'></i> Delete
+                                </button>
+                              </td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='5' class='px-6 py-4 text-center text-gray-500'>No recipes found</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
                 </div>
             </div>
 
@@ -147,92 +147,67 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
                 </button>
 
                 <!-- Production Schedule Table -->
-                <table class="w-full bg-white rounded-lg shadow">
-                    <thead class="bg-gray-800 text-white">
-                        <tr>
-                            <th class="px-6 py-3 text-left">Product</th>
-                            <th class="px-6 py-3 text-left">Date</th>
-                            <th class="px-6 py-3 text-left">Order Volume</th>
-                            <th class="px-6 py-3 text-left">Production Capacity</th>
-                            <th class="px-6 py-3 text-left">Staff Assigned</th>
-                            <th class="px-6 py-3 text-left">Equipment</th>
-                            <th class="px-6 py-3 text-left">Equipment Status</th>
-                            <th class="px-6 py-3 text-left">Total Ingredients</th>
-                            <th class="px-6 py-3 text-left">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $sql = "SELECT p.*, r.recipe_name, r.equipment_tbl,
-                               (
-                                   SELECT GROUP_CONCAT(a2.name_tbl)
-                                   FROM admin_db a2
-                                   WHERE FIND_IN_SET(a2.admin_id, p.staff_availability)
-                               ) as staff_names,
-                               CASE 
-                                   WHEN p.production_date = CURDATE() THEN 'In Use'
-                                   WHEN p.production_date > CURDATE() THEN 'Scheduled'
-                                   WHEN p.production_date < CURDATE() THEN 'Available'
-                                   ELSE es.status
-                               END as equipment_status,
-                               (
-                                   SELECT GROUP_CONCAT(
-                                       CONCAT(ri.ingredient_name, ': ', (ri.quantity * p.order_volume), ' ', ri.unit_tbl)
-                                       SEPARATOR ', '
-                                   )
-                                   FROM recipe_ingredients ri
-                                   WHERE ri.recipe_id = p.recipe_id
-                               ) as total_ingredients
-                               FROM production_db p 
-                               LEFT JOIN recipe_db r ON p.recipe_id = r.recipe_id
-                               LEFT JOIN equipment_status es ON es.equipment_id = p.equipment_id
-                               GROUP BY p.production_id
-                               ORDER BY p.production_date DESC";
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead>
+                            <tr class="bg-gray-800 text-white">
+                                <th class="py-3 px-4 text-left">Product</th>
+                                <th class="py-3 px-4 text-left">Date</th>
+                                <th class="py-3 px-4 text-left">Order Volume</th>
+                                <th class="py-3 px-4 text-left">Production Capacity</th>
+                                <th class="py-3 px-4 text-left">Staff Assigned</th>
+                                <th class="py-3 px-4 text-left">Equipment</th>
+                                <th class="py-3 px-4 text-left">Equipment Status</th>
+                                <th class="py-3 px-4 text-left">Total Ingredients</th>
+                                <th class="py-3 px-4 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $sql = "SELECT p.*, 
+                                    r.recipe_name,
+                                    e.equipment_name,
+                                    e.status as equipment_status,
+                                    GROUP_CONCAT(DISTINCT a.name_tbl) as staff_names,
+                                    (SELECT CONCAT(ri.ingredient_name, ': ', (ri.quantity * p.order_volume), ' ', ri.unit_tbl)
+                                     FROM recipe_ingredients ri 
+                                     WHERE ri.recipe_id = p.recipe_id 
+                                     LIMIT 1) as total_ingredients
+                                    FROM production_db p
+                                    LEFT JOIN recipe_db r ON p.recipe_id = r.recipe_id
+                                    LEFT JOIN equipment_status e ON p.equipment_id = e.equipment_id
+                                    LEFT JOIN admin_db a ON FIND_IN_SET(a.admin_id, p.staff_availability)
+                                    GROUP BY p.production_id
+                                    ORDER BY p.production_date DESC";
 
-                        $result = $conn->query($sql);
+                            $result = $conn->query($sql);
 
-                        if ($result && $result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
-                                $status_class = match ($row['equipment_status']) {
-                                    'Available' => 'text-green-600',
-                                    'In Use' => 'text-yellow-600',
-                                    'Scheduled' => 'text-blue-600',
-                                    'Maintenance' => 'text-red-600',
-                                    default => 'text-gray-600'
-                                };
-
                                 echo "<tr class='border-b hover:bg-gray-50'>";
-                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['recipe_name']) . "</td>";
-                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['production_date']) . "</td>";
-                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['order_volume']) . " units</td>";
-                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['capacity']) . " units</td>";
-                                echo "<td class='px-6 py-4'>" .
-                                    (empty($row['staff_names']) ?
-                                        '<span class="text-red-500">No staff assigned</span>' :
-                                        htmlspecialchars($row['staff_names'])) .
-                                    "</td>";
-                                echo "<td class='px-6 py-4'>" . htmlspecialchars($row['equipment_tbl']) . "</td>";
-                                echo "<td class='px-6 py-4 {$status_class} font-medium'>" .
-                                    htmlspecialchars($row['equipment_status']) . "</td>";
-                                echo "<td class='px-6 py-4 text-sm'>" . htmlspecialchars($row['total_ingredients']) . "</td>";
-                                echo "<td class='px-6 py-4'>
-                                        <button onclick='editSchedule(" . json_encode($row) . ")' 
-                                            class='text-blue-600 hover:text-blue-800 mr-2'>
-                                            <i class='fas fa-edit'></i>
-                                        </button>
-                                        <button onclick='deleteSchedule(" . $row['production_id'] . ")' 
-                                            class='text-red-600 hover:text-red-800'>
-                                            <i class='fas fa-trash'></i>
-                                        </button>
-                                      </td>";
+                                echo "<td class='py-2 px-4'>{$row['recipe_name']}</td>";
+                                echo "<td class='py-2 px-4'>{$row['production_date']}</td>";
+                                echo "<td class='py-2 px-4'>{$row['order_volume']} units</td>";
+                                echo "<td class='py-2 px-4'>{$row['capacity']} units/hour</td>";
+                                echo "<td class='py-2 px-4'>{$row['staff_names']}</td>";
+                                echo "<td class='py-2 px-4'>{$row['equipment_name']}</td>";
+                                echo "<td class='py-2 px-4'>";
+                                if ($row['equipment_status'] == 'Available') {
+                                    echo "<span class='text-green-600'>Available</span>";
+                                } else {
+                                    echo "<span class='text-blue-600'>Scheduled</span>";
+                                }
+                                echo "</td>";
+                                echo "<td class='py-2 px-4'>{$row['total_ingredients']}</td>";
+                                echo "<td class='py-2 px-4 flex gap-2'>";
+                                echo "<button onclick='editSchedule({$row['production_id']})' class='text-blue-600 hover:text-blue-800'><i class='fas fa-edit'></i></button>";
+                                echo "<button onclick='deleteSchedule({$row['production_id']})' class='text-red-600 hover:text-red-800'><i class='fas fa-trash'></i></button>";
+                                echo "</td>";
                                 echo "</tr>";
                             }
-                        } else {
-                            echo "<tr><td colspan='9' class='px-6 py-4 text-center'>No schedules found</td></tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Batch Section -->
@@ -387,6 +362,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
                         class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                 </div>
 
+                <!-- Add Production Capacity field -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Production Capacity (units/hour)</label>
+                    <input type="number" id="capacity" name="capacity" required min="1"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
+                </div>
+
                 <!-- Equipment Selection -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Equipment</label>
@@ -416,18 +398,19 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
 
                 <!-- Form Buttons -->
                 <div class="flex justify-end gap-2 pt-4">
-                    <button type="button" onclick="closeScheduleModal()"
-                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                    <button type="button"
+                        onclick="closeScheduleModal()"
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
                         Cancel
                     </button>
                     <button type="submit"
-                        class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700">
+                        class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors">
                         Save Schedule
                     </button>
                 </div>
             </form>
-        </div>
     </div>
+</div>
 
     <script>
         function switchTab(tabName) {
@@ -536,8 +519,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
                 const equipmentSelect = document.getElementById('equipment');
                 if (equipmentSelect && recipe.equipment_tbl) {
                     equipmentSelect.value = recipe.equipment_tbl;
-                }
-            } else {
+                    }
+                } else {
                 // Adding new recipe
                 document.getElementById('recipe_id').value = '';
             }
@@ -632,31 +615,48 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
             select.required = true;
             select.className = 'flex-grow px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500';
 
+            // Get selected date
+            const productionDate = document.getElementById('production_date')?.value;
+            if (!productionDate) {
+                select.innerHTML = '<option value="">Select production date first</option>';
+                div.appendChild(select);
+                return div;
+            }
+
             select.innerHTML = '<option value="">Loading staff...</option>';
 
-            // Fetch all bakers
-            fetch('get_available_staff.php')
+            // Fetch available staff for the selected date
+            fetch(`get_available_staff.php?production_date=${encodeURIComponent(productionDate)}`)
                 .then(response => {
-                    console.log('Response status:', response.status);
-                    return response.json();
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
                 })
-                .then(data => {
-                    console.log('Staff data received:', data);
+                .then(text => {
+                    const data = JSON.parse(text);
+                    console.log('Staff data for date:', productionDate, data);
 
                     select.innerHTML = '<option value="">Select Staff</option>';
 
-                    if (data.success && data.data && data.data.length > 0) {
-                        data.data.forEach(staff => {
-                            const option = new Option(staff.name_tbl, staff.admin_id);
-                            select.add(option);
-                        });
+                    if (data.success && Array.isArray(data.data)) {
+                        if (data.data.length > 0) {
+                            data.data.forEach(staff => {
+                                const option = document.createElement('option');
+                                option.value = staff.admin_id;
+                                option.textContent = staff.name_tbl;
+                                select.appendChild(option);
+                            });
+                        } else {
+                            select.innerHTML = '<option value="">No staff available for this date</option>';
+                        }
                     } else {
-                        select.innerHTML = '<option value="">No staff available</option>';
+                        throw new Error('Invalid data structure received');
                     }
                 })
                 .catch(error => {
-                    console.error('Error loading staff:', error);
-                    select.innerHTML = '<option value="">Error loading staff</option>';
+                    console.error('Staff loading error:', error);
+                    select.innerHTML = `<option value="">Error: ${error.message}</option>`;
                 });
 
             // Add remove button
@@ -707,7 +707,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
                     const [name, quantity, unit] = ingredient.split('|');
                     if (index === 0) {
                         container.innerHTML = createIngredientRow(name, quantity, unit);
-                    } else {
+        } else {
                         addIngredientRowWithValues(name, quantity, unit);
                     }
                 });
@@ -840,12 +840,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
         }
 
         // Recipe CRUD Functions
-        function editRecipe(recipe) {
-            showRecipeModal(recipe);
-        }
+    function editRecipe(recipe) {
+        showRecipeModal(recipe);
+    }
 
-        function deleteRecipe(id) {
-            if (confirm('Are you sure you want to delete this recipe?')) {
+    function deleteRecipe(id) {
+        if (confirm('Are you sure you want to delete this recipe?')) {
                 window.location.href = `delete_recipe.php?id=${id}`;
             }
         }
@@ -858,7 +858,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
             }
         }
 
-        function showScheduleModal(schedule = null) {
+    function showScheduleModal(schedule = null) {
             const modal = document.getElementById('scheduleModal');
             const staffContainer = document.getElementById('staff-container');
 
@@ -870,7 +870,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
             modal.classList.remove('hidden');
 
             // Reset the form
-            const form = document.getElementById('scheduleForm');
+        const form = document.getElementById('scheduleForm');
             if (form) form.reset();
 
             // Create initial staff dropdown
@@ -879,7 +879,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
             staffContainer.appendChild(staffSelect);
 
             // If editing an existing schedule
-            if (schedule) {
+        if (schedule) {
                 document.getElementById('schedule_id').value = schedule.schedule_id || '';
                 document.getElementById('product').value = schedule.product_id || '';
                 document.getElementById('production_date').value = schedule.production_date || '';
@@ -918,44 +918,137 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
         // Add this function to handle recipe selection
         document.getElementById('product').addEventListener('change', function() {
             const recipeId = this.value;
-            const orderVolume = document.getElementById('order_volume').value || 1;
-            const productionDate = document.getElementById('production_date').value || new Date().toISOString().split('T')[0];
+            if (!recipeId) return;
 
-            if (recipeId) {
-                fetch(`get_recipe.php?recipe_id=${recipeId}&volume=${orderVolume}&production_date=${productionDate}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Update equipment
-                            const equipmentSelect = document.getElementById('equipment_id');
-                            if (equipmentSelect) {
-                                equipmentSelect.value = data.recipe.equipment;
+            fetch(`get_recipe.php?recipe_id=${recipeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update equipment dropdown with recipe's equipment
+                        const equipmentSelect = document.getElementById('equipment_id');
+                        if (equipmentSelect) {
+                            equipmentSelect.innerHTML = '<option value="">Select Equipment</option>';
+                            
+                            if (data.recipe.equipment_id && data.recipe.equipment_name) {
+                                const option = document.createElement('option');
+                                option.value = data.recipe.equipment_id;
+                                option.textContent = data.recipe.equipment_name;
+                                equipmentSelect.appendChild(option);
+                            } else {
+                                equipmentSelect.innerHTML = '<option value="">No equipment specified for this recipe</option>';
                             }
-
-                            // Update staff options
-                            const staffContainer = document.getElementById('staff-container');
-                            if (staffContainer) {
-                                staffContainer.innerHTML = ''; // Clear existing staff
-                                const staffSelect = createStaffSelectWithOptions(data.recipe.available_staff);
-                                staffContainer.appendChild(staffSelect);
-                            }
-
-                            // Show ingredients calculation
-                            const ingredientsInfo = document.createElement('div');
-                            ingredientsInfo.className = 'mt-2 text-sm text-gray-600';
-                            ingredientsInfo.innerHTML = '<strong>Required Ingredients:</strong><br>' +
-                                data.recipe.ingredients.map(ing =>
-                                    `${ing.ingredient_name}: ${ing.quantity} ${ing.unit}`
-                                ).join('<br>');
-
-                            const orderVolumeInput = document.getElementById('order_volume');
-                            orderVolumeInput.parentNode.appendChild(ingredientsInfo);
                         }
-                    })
-                    .catch(error => console.error('Error:', error));
+
+                        // Show ingredients calculation
+                        const ingredientsInfo = document.createElement('div');
+                        ingredientsInfo.className = 'mt-2 text-sm text-gray-600 ingredient-info';
+                        ingredientsInfo.innerHTML = '<strong>Required Ingredients:</strong><br>' +
+                            data.recipe.ingredients.map(ing =>
+                                `${ing.ingredient_name}: ${ing.quantity} ${ing.unit}`
+                            ).join('<br>');
+
+                        const orderVolumeInput = document.getElementById('order_volume');
+                        // Remove any existing info
+                        const existingIngredients = orderVolumeInput.parentNode.querySelector('.ingredient-info');
+                        if (existingIngredients) existingIngredients.remove();
+
+                        orderVolumeInput.parentNode.appendChild(ingredientsInfo);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const equipmentSelect = document.getElementById('equipment_id');
+                    if (equipmentSelect) {
+                        equipmentSelect.innerHTML = '<option value="">Error loading equipment</option>';
+                    }
+                });
+        });
+
+        // Add this function to update equipment when date changes
+        function updateAvailableEquipment() {
+            const productionDate = document.getElementById('production_date')?.value;
+            if (!productionDate) return;
+
+            const equipmentSelect = document.getElementById('equipment_id');
+            if (!equipmentSelect) return;
+
+            equipmentSelect.innerHTML = '<option value="">Loading equipment...</option>';
+
+            fetch(`get_available_equipment.php?production_date=${encodeURIComponent(productionDate)}`)
+                .then(response => response.json())
+                .then(data => {
+                    equipmentSelect.innerHTML = '<option value="">Select Equipment</option>';
+
+                    if (data.success && data.data.length > 0) {
+                        data.data.forEach(equipment => {
+                            const option = document.createElement('option');
+                            option.value = equipment.equipment_id;
+                            option.textContent = equipment.equipment_name;
+                            equipmentSelect.appendChild(option);
+                        });
+                    } else {
+                        equipmentSelect.innerHTML = '<option value="">No equipment available for this date</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading equipment:', error);
+                    equipmentSelect.innerHTML = '<option value="">Error loading equipment</option>';
+                });
+        }
+
+        // Add event listener to production date
+        document.getElementById('production_date')?.addEventListener('change', function() {
+            const staffContainer = document.getElementById('staff-container');
+            if (staffContainer) {
+                staffContainer.innerHTML = '';
+                if (this.value) {
+                    const select = createStaffSelect();
+                    staffContainer.appendChild(select);
+                }
             }
         });
-    </script>
+
+        // Add these functions for production schedule modal
+        function closeScheduleModal() {
+            const modal = document.getElementById('scheduleModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                // Reset form
+                const form = document.getElementById('scheduleForm');
+                if (form) {
+                    form.reset();
+                }
+                // Clear staff container
+                const staffContainer = document.getElementById('staff-container');
+                if (staffContainer) {
+                    staffContainer.innerHTML = '';
+                }
+                // Reset equipment select
+                const equipmentSelect = document.getElementById('equipment_id');
+                if (equipmentSelect) {
+                    equipmentSelect.innerHTML = '<option value="">Select production date first</option>';
+                }
+                // Clear any ingredient info
+                const ingredientInfo = document.querySelector('.ingredient-info');
+                if (ingredientInfo) {
+                    ingredientInfo.remove();
+                }
+            }
+        }
+
+        // Add click outside modal to close
+    window.onclick = function(event) {
+        const recipeModal = document.getElementById('recipeModal');
+        const scheduleModal = document.getElementById('scheduleModal');
+
+        if (event.target === recipeModal) {
+            closeRecipeModal();
+        }
+        if (event.target === scheduleModal) {
+            closeScheduleModal();
+        }
+    }
+</script>
 </body>
 
 </html>

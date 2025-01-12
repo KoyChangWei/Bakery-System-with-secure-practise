@@ -6,6 +6,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['user_role'] == 'superviso
     try {
         $conn->begin_transaction();
 
+        // Check for duplicate recipe name
+        $check_sql = "SELECT recipe_id FROM recipe_db WHERE recipe_name = ?";
+        $check_stmt = $conn->prepare($check_sql);
+        $check_stmt->bind_param("s", $_POST['recipe_name']);
+        $check_stmt->execute();
+        $result = $check_stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            throw new Exception("A recipe with this name already exists!");
+        }
+
         // Debug: Print POST data
         error_log("POST data: " . print_r($_POST, true));
 
