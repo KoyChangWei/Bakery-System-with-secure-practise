@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Roti Sri Bakery</title>
+    <link rel="stylesheet" href="about-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="assets/logo.png" alt="Roti Sri">
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About Us</a>
+            <a href="login.html" class="login-btn">Login</a>
+        </div>
+    </nav>
+
+    <!-- About Header -->
+    <header class="about-header animate__animated animate__fadeIn">
+        <h1 class="gradient-text">Our Sweet Journey</h1>
+        <p class="subtitle">A Story of Passion, Tradition & Innovation 🥖✨</p>
+    </header>
+
+    <!-- About Content -->
+    <main class="about-content">
+        <div class="logo-container animate__animated animate__pulse">
+            <img src="assets/logo.png" alt="Roti Sri Logo" class="about-logo floating">
+        </div>
+        
+        <div class="story-cards">
+            <div class="story-card animate__animated animate__fadeInLeft">
+                <span class="emoji">👨‍🍳</span>
+                <h3>Our Beginnings</h3>
+                <p>Started by Encik Razak Hassan in the 1980s with just one small oven and big dreams. Today, that same passion continues to drive us forward.</p>
+            </div>
+
+            <div class="story-card animate__animated animate__fadeInRight">
+                <span class="emoji">🏆</span>
+                <h3>Community Love</h3>
+                <p>Proud to be Alor Star's favorite bakery, serving fresh, quality baked goods that have brought smiles to generations of families.</p>
+            </div>
+
+            <div class="story-card animate__animated animate__fadeInLeft">
+                <span class="emoji">🌱</span>
+                <h3>Growing Together</h3>
+                <p>As we embrace modern innovations, our commitment to quality and community remains unchanged. We're excited to serve you better in the digital age!</p>
+            </div>
+        </div>
+
+        <div class="fun-counter">
+            <h3>Our Journey in Numbers</h3>
+            <div class="counter-grid">
+                <div class="counter-item">
+                    <span class="count" data-target="43">0</span>
+                    <p>Years of Service</p>
+                </div>
+                <div class="counter-item">
+                    <span class="count" data-target="1000">0</span>
+                    <p>Daily Fresh Breads</p>
+                </div>
+                <div class="counter-item">
+                    <span class="count" data-target="3">0</span>
+                    <p>Generations Served</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonial-section">
+            <h3>What Our Community Says</h3>
+            <div class="testimonial-carousel" id="testimonialCarousel" aria-live="polite" aria-label="Customer Testimonials">
+                <!-- Testimonials will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3>ROTI SRI BAKERY</h3>
+                <p>Bringing traditional flavors with modern convenience to Alor Star since 1980.</p>
+            </div>
+            <div class="footer-social">
+                <a href="#" class="social-link" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <p>&copy; 2024 Roti Sri Bakery | Bakery Management System</p>
+        </div>
+    </footer>
+
+    <script>
+        // Animated Counter
+        const counters = document.querySelectorAll('.count');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counter = entry.target;
+                    const target = +counter.getAttribute('data-target');
+                    const increment = target / 100;
+
+                    const updateCounter = () => {
+                        const count = +counter.innerText;
+                        if (count < target) {
+                            counter.innerText = Math.ceil(count + increment);
+                            setTimeout(updateCounter, 10);
+                        } else {
+                            counter.innerText = target;
+                        }
+                    };
+
+                    updateCounter();
+                    observer.unobserve(counter); // Stop observing once animated
+                }
+            });
+        });
+
+        counters.forEach(counter => observer.observe(counter));
+
+        // Testimonial Carousel
+        const testimonials = [
+            { text: "Been coming here since I was a child. Still the best bread in town!", author: "Sarah L." },
+            { text: "Their traditional recipes are unmatched. A true Alor Star gem!", author: "Ahmad R." },
+            { text: "Modern service with the same great taste I remember from childhood.", author: "Ming C." }
+        ];
+
+        const carousel = document.getElementById('testimonialCarousel');
+        let currentTestimonial = 0;
+
+        function showTestimonial() {
+            const testimonial = testimonials[currentTestimonial];
+            carousel.innerHTML = `
+                <div class="testimonial animate__animated animate__fadeIn">
+                    <p>"${testimonial.text}"</p>
+                    <span class="author">- ${testimonial.author}</span>
+                </div>
+            `;
+            currentTestimonial = (currentTestimonial + 1) % testimonials.length;
+        }
+
+        showTestimonial();
+        setInterval(showTestimonial, 5000);
+    </script>
+</body>
+</html>

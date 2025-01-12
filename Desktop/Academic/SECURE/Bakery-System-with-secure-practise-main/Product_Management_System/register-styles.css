@@ -1,0 +1,192 @@
+/* Import base styles */
+@import 'styles.css';
+
+/* Register specific styles */
+.register-section {
+    min-height: 100vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+        url('assets/bakery_window.jpg') center center / cover no-repeat;
+    padding: 4rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center container vertically */
+}
+
+.register-container {
+    flex: 1;
+    max-width: 610px;
+    min-height: 530px;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(50, 50, 50, 0.9));
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    padding: 2.5rem;
+    text-align: center;
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    opacity: 0;
+    animation: fadeInUp 1.5s ease-in-out forwards;
+}
+
+.register-container h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; /* Adjusted font size for balance */
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    text-align: center; /* Ensures text alignment */
+}
+
+.register-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 1.5rem; /* Space between form fields */
+    align-items: start; /* Align fields to the top of each column */
+    margin-bottom: 2rem; /* Space between the form and the button */
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 1rem;
+    width: 100%; /* Ensures inputs take the full column width */
+}
+
+.form-group.centered {
+    display: flex;
+    justify-content: center;
+}
+
+/* Label Styling */
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: left; /* Aligns all labels to the left */
+}
+
+/* Input and Select Fields */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group select {
+    width: 100%; /* Full width of column */
+    padding: 0.75rem; /* Consistent padding */
+    font-size: 1rem; /* Matches input font size */
+    border: 1px solid var(--border-color);
+    border-radius: 8px; /* Matches input border-radius */
+    background: var(--darker-bg); /* Matches input background */
+    color: var(--text-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Matches input shadow */
+    transition: all 0.3s ease; /* Matches input transition */
+    height: auto; /* Ensures flexibility across devices */
+}
+
+/* Focused Input and Select Fields */
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--hover-color);
+    box-shadow: 0 0 10px var(--hover-color);
+    background: rgba(40, 40, 40, 0.9); /* Matches focused background */
+}
+
+/* Gender Options Styling */
+.gender-options {
+    display: flex;
+    gap: 1rem; /* Spacing between options */
+    grid-column: span 2; /* Span across both columns */
+    justify-content: center; /* Center-align gender options */
+}
+
+.gender-options label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Space between the label text and radio button */
+    cursor: pointer;
+    color: var(--text-color); /* Matches input text color */
+}
+/* New button container styling for centering */
+.register-btn-container {
+    grid-column: span 2; /* Span across both columns */
+    text-align: center; /* Center-align the button within the form */
+    margin-top: 1rem;
+}
+
+.register-btn {
+    padding: 1rem 2rem; /* Adjust padding for a balanced button size */
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.register-btn:hover {
+    background-color: var(--hover-color);
+    transform: translateY(-3px);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 1rem;
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.login-link a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.login-link a:hover {
+    color: #ffcc00;
+    text-decoration: underline;
+}
+
+/* Center title and link */
+.register-header,
+.register-footer {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.register-footer {
+    margin-top: 1rem; /* Space between form and footer */
+}
+
+/* Form validation styles */
+.form-group input:invalid,
+.form-group select:invalid {
+    border-color: #ff4444;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .register-container {
+        padding: 1.5rem;
+        max-width: 90%; /* Adjust width for smaller screens */
+    }
+
+    .gender-options {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

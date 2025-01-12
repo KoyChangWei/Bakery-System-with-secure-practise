@@ -1,0 +1,145 @@
+\<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Roti Sri Bakery</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="register-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Center the register button outside the grid */
+        .register-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+            margin-bottom: 2rem; /* Space between form and footer */
+        }
+
+        .register-btn-container {
+            text-align: center; /* Center align the button */
+        }
+
+        .register-btn {
+            padding: 1rem 2rem; /* Balanced padding for button size */
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .register-btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="assets/logo.png" alt="Roti Sri" class="h-8 w-auto">
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="hover-effect">Home</a>
+            <a href="about.html" class="hover-effect">About Us</a>
+            <a href="login.html" class="login-btn">Login</a>
+        </div>
+    </nav>
+
+    <!-- Register Section -->
+    <section class="register-section">
+        <div class="register-container">
+            <!-- Centered Header -->
+            <div class="register-header">
+                <h1 class="gradient-text">Register</h1>
+            </div>
+
+            <!-- Form Section -->
+            <form class="register-form" action="register-process.php" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div class="gender-options">
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="male" required>
+                            Male
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="female">
+                            Female
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" required>
+                        <option value="">Select Role</option>
+                        <option value="baker">Baker</option>
+                        <option value="supervisor">Supervisor</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your password" required>
+                </div>
+
+                <!-- Register Button Section -->
+                <div class="register-btn-container">
+                    <button type="submit" class="register-btn">Register</button>
+                </div>
+            </form>
+
+            <!-- Centered Footer -->
+            <div class="register-footer">
+                <p class="login-link">Already have an account? <a href="login.html" class="hover-effect">Login here</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3>ROTI SRI BAKERY</h3>
+                <p>Your trusted local bakery in Alor Star, bringing traditional flavors with modern convenience.</p>
+            </div>
+            <div class="footer-social">
+                <a href="#" class="social-link" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-link" aria-label="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <p>&copy; 2024 Roti Sri Bakery | Bakery Management System</p>
+        </div>
+    </footer>
+</body>
+</html>
