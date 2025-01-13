@@ -142,7 +142,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['user_role'] == 'superviso
                 }
             }
         }
-
+// Update equipment status after recipe update/creation
+$update_equipment_sql = "UPDATE equipment_status e 
+    SET status = CASE
+        WHEN EXISTS (
+            SELECT 1 FROM recipe_db r 
+            WHERE FIND_IN_SET(e.equipment_name, r.equipment_tbl)
+        ) THEN 'In Use'
+        ELSE 'Available'
+    END";
+$conn->query($update_equipment_sql);
         $conn->commit();
         
         echo "<script>

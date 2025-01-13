@@ -391,24 +391,19 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
                         <option value="">Select Equipment</option>
                         <?php
                         $equipment_sql = "
-                            SELECT 
-                                es.equipment_name,
-                                COALESCE(
-                                    CASE 
-                                        WHEN EXISTS (
-                                            SELECT 1 FROM recipe_db r
-                                            WHERE r.equipment_tbl = es.equipment_name
-                                            AND r.recipe_id != COALESCE(?, 0)
-                                        ) THEN 'In Use'
-                                        ELSE es.status
-                                    END, 'Available'
-                                ) AS current_status
-                            FROM equipment_status es
-                            ORDER BY es.equipment_name";
-
-                        $stmt = $conn->prepare($equipment_sql);
-                        $recipe_id = isset($_GET['id']) ? $_GET['id'] : 0;
-                        $stmt->bind_param('i', $recipe_id);
+                                                SELECT 
+                                                    es.equipment_name,
+                                                    CASE 
+                                                        WHEN EXISTS (
+                                                            SELECT 1 FROM recipe_db r
+                                                            WHERE FIND_IN_SET(es.equipment_name, r.equipment_tbl)
+                                                        ) THEN 'In Use'
+                                                        ELSE es.status 
+                                                    END AS current_status
+                                                FROM equipment_status es
+                                                ORDER BY es.equipment_name";
+                        
+                                                $stmt = $conn->prepare($equipment_sql);
                         $stmt->execute();
                         $equipment_result = $stmt->get_result();
 
@@ -655,75 +650,65 @@ function editSchedule(scheduleId) {
             }
         }
 
-        // Updated showRecipeModal function
+        // Update showRecipeModal function to handle equipment properly
         function showRecipeModal(recipe = null) {
-            const modal = document.getElementById('recipeModal');
-            const form = document.getElementById('recipeForm');
+    const modal = document.getElementById('recipeModal');
+    const form = document.getElementById('recipeForm');
 
-            if (!modal || !form) {
-                console.error('Modal or form elements not found');
-                return;
-            }
+    if (!modal || !form) return;
 
-            // Reset form and show modal
-            form.reset();
-            modal.classList.remove('hidden');
+    // Reset form and show modal
+    form.reset();
+    modal.classList.remove('hidden');
 
-            // Initialize containers with default rows
-            const ingredientsContainer = document.getElementById('ingredients-container');
-            const stepsContainer = document.getElementById('steps-container');
+    // Clear containers
+    document.getElementById('ingredients-container').innerHTML = '';
+    document.getElementById('steps-container').innerHTML = '';
 
-            // Set form mode
-            form.setAttribute('data-mode', recipe ? 'edit' : 'create');
-
-            if (ingredientsContainer) {
-                ingredientsContainer.innerHTML = createIngredientRow();
-            }
-
-            if (stepsContainer) {
-                stepsContainer.innerHTML = createStepRow('', 1);
-            }
-
-            if (recipe) {
-                // Editing existing recipe
-                document.getElementById('recipe_id').value = recipe.recipe_id || '';
-                document.getElementById('recipe_name').value = recipe.recipe_name || '';
-
-                if (recipe.ingredient_data) {
-                    handleIngredients(recipe);
-                }
-
-                if (recipe.preparation_step_tbl) {
-                    handleSteps(recipe);
-                }
-
-                // Set equipment without async call
-                const equipmentSelect = document.getElementById('equipment');
-                if (equipmentSelect && recipe.equipment_tbl) {
-                    equipmentSelect.value = recipe.equipment_tbl;
-                }
-            } else {
-                // Adding new recipe
-                document.getElementById('recipe_id').value = '';
+    if (recipe) {
+        // Only populate fields if editing an existing recipe
+        document.getElementById('recipe_id').value = recipe.recipe_id || '';
+        document.getElementById('recipe_name').value = recipe.recipe_name || '';
+        
+        const equipmentSelect = document.getElementById('equipment');
+        if (equipmentSelect && recipe.equipment_tbl) {
+            const currentOption = Array.from(equipmentSelect.options)
+                .find(option => option.value === recipe.equipment_tbl);
+            
+            if (currentOption) {
+                currentOption.selected = true;
+                currentOption.disabled = false;
             }
         }
 
-        // Form submission handler
-        document.getElementById('recipeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Handle ingredients and steps for existing recipe
+        handleIngredients(recipe);
+        handleSteps(recipe);
+    } else {
+        // Add empty ingredient and step rows for new recipe
+        addIngredientRow();
+        addStep();
+    }
+}
 
-            // Basic validation
-            const recipeName = document.getElementById('recipe_name').value;
-            const equipment = document.getElementById('equipment').value;
+        // Update the form submission handler
+document.getElementById('recipeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-            if (!recipeName || !equipment) {
-                alert('Please fill in all required fields');
-                return;
-            }
+    // Basic validation
+    const recipeName = document.getElementById('recipe_name').value;
+    const equipment = document.getElementById('equipment').value;
+    const recipeId = document.getElementById('recipe_id').value;
 
-            // Submit the form
-            this.submit();
-        });
+    // Only require equipment selection for new recipes
+    if (!recipeName || (!equipment && !recipeId)) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    // Submit the form
+    this.submit();
+});
 
         // Close modal function
         function closeRecipeModal() {

@@ -87,11 +87,11 @@ try {
                     <h2 class="text-2xl font-semibold text-gray-800">Recipe List</h2>
                     <p class="text-gray-600">View standardized recipes and preparation instructions</p>
 <!-- Recipe Detail Modal -->
-<div id="recipeDetailModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+<div id="recipeDetailModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
         <div class="flex justify-between items-center mb-4">
             <h3 id="modalTitle" class="text-2xl font-semibold text-gray-800"></h3>
-            <button onclick="closeRecipeModal()" class="text-gray-600 hover:text-gray-800">
+            <button onclick="closeRecipeDetail()" class="text-gray-600 hover:text-gray-800">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -284,6 +284,7 @@ try {
                                 <input type="datetime-local" name="endDate_tbl"
                                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500">
                             </div>
+                            
                         </div>
                         <!-- New Worker Section -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -446,17 +447,31 @@ try {
                             <?php
                             try {
                                 $batch_sql = "SELECT b.*, 
-                                              r.worker_count, 
-                                              r.worker_names, 
-                                              r.temperature, 
-                                              r.moisture, 
-                                              r.weight, 
-                                              r.target_quantity, 
-                                              r.actual_quantity, 
-                                              r.defect_count 
-                                              FROM batch_db b 
-                                              LEFT JOIN batch_reports r ON b.batch_no_tbl = r.batch_no 
-                                              ORDER BY b.startDate_tbl DESC";
+                         r.worker_count, 
+                         r.worker_names, 
+                         r.temperature, 
+                         r.moisture, 
+                         r.weight, 
+                         r.target_quantity, 
+                         r.actual_quantity, 
+                         r.defect_count 
+                  FROM batch_db b 
+                  LEFT JOIN (
+                      SELECT batch_no, 
+                             worker_count,
+                             worker_names,
+                             temperature,
+                             moisture,
+                             weight,
+                             target_quantity,
+                             actual_quantity,
+                             defect_count
+                      FROM batch_reports 
+                      GROUP BY batch_no
+                  ) r ON b.batch_no_tbl = r.batch_no 
+                  ORDER BY b.startDate_tbl DESC";
+    
+                                
                                 $stmt = $conn->prepare($batch_sql);
                                 $stmt->execute();
                                 $batch_result = $stmt->get_result();
@@ -470,57 +485,58 @@ try {
                                             default => 'bg-gray-100 text-gray-800'
                                         };
                                         
-                                        echo "<tr class='hover:bg-gray-50'>";
+                                        echo "<tr data-batch-id='" . htmlspecialchars($row['batch_no_tbl']) . "' class='hover:bg-gray-50'>";
                                         echo "<td class='px-6 py-4 font-medium text-gray-900'>" . htmlspecialchars($row['batch_no_tbl']) . "</td>";
                                         echo "<td class='px-6 py-4'>" . date('Y-m-d H:i', strtotime($row['startDate_tbl'])) . "</td>";
                                         echo "<td class='px-6 py-4'>" . ($row['endDate_tbl'] ? date('Y-m-d H:i', strtotime($row['endDate_tbl'])) : '-') . "</td>";
                                         
                                         // Worker details
                                         echo "<td class='px-6 py-4'>
-                                            <div class='text-sm'>
-                                                <p><strong>Count:</strong> " . htmlspecialchars($row['worker_count']) . "</p>
-                                                <p><strong>Names:</strong> " . htmlspecialchars($row['worker_names']) . "</p>
-                                            </div>
-                                        </td>";
+                                                <div class='text-sm'>
+                                                    <p><strong>Count:</strong> " . htmlspecialchars($row['worker_count']) . "</p>
+                                                    <p><strong>Names:</strong> " . htmlspecialchars($row['worker_names']) . "</p>
+                                                </div>
+                                            </td>";
                                         
                                         echo "<td class='px-6 py-4'>" . ucwords(htmlspecialchars($row['production_stage_tbl'])) . "</td>";
-                                       
+                                        
                                         // Quality check details
                                         echo "<td class='px-6 py-4'>
-                                            <div class='text-sm'>
-                                                <p><strong>Temperature:</strong> " . htmlspecialchars($row['temperature']) . "°C</p>
-                                                <p><strong>Moisture:</strong> " . htmlspecialchars($row['moisture']) . "%</p>
-                                                <p><strong>Weight:</strong> " . htmlspecialchars($row['weight']) . "g</p>
-                                                <p><strong>Notes:</strong> " . nl2br(htmlspecialchars($row['quality_check_tbl'])) . "</p>
-                                            </div>
-                                        </td>";
+                                                <div class='text-sm'>
+                                                    <p><strong>Temperature:</strong> " . htmlspecialchars($row['temperature']) . "°C</p>
+                                                    <p><strong>Moisture:</strong> " . htmlspecialchars($row['moisture']) . "%</p>
+                                                    <p><strong>Weight:</strong> " . htmlspecialchars($row['weight']) . "g</p>
+                                                    <p><strong>Notes:</strong> " . nl2br(htmlspecialchars($row['quality_check_tbl'])) . "</p>
+                                                </div>
+                                            </td>";
                                         
                                         // Quantity details
                                         echo "<td class='px-6 py-4'>
-                                            <div class='text-sm'>
-                                                <p><strong>Target:</strong> " . htmlspecialchars($row['target_quantity']) . "</p>
-                                                <p><strong>Actual:</strong> " . htmlspecialchars($row['actual_quantity']) . "</p>
-                                                <p><strong>Defects:</strong> " . htmlspecialchars($row['defect_count']) . "</p>
-                                            </div>
-                                        </td>";
+                                                <div class='text-sm'>
+                                                    <p><strong>Target:</strong> " . htmlspecialchars($row['target_quantity']) . "</p>
+                                                    <p><strong>Actual:</strong> " . htmlspecialchars($row['actual_quantity']) . "</p>
+                                                    <p><strong>Defects:</strong> " . htmlspecialchars($row['defect_count']) . "</p>
+                                                </div>
+                                            </td>";
                                         
                                         echo "<td class='px-6 py-4'>
                                                 <span class='px-2 py-1 rounded-full text-xs font-medium {$status_class}'>
                                                     {$row['status_tbl']}
                                                 </span>
-                                              </td>";
+                                            </td>";
+                                            
                                         echo "<td class='px-6 py-4'>
                                                 <div class='flex items-center gap-2'>
-                                                    <button onclick='editBatch(" . json_encode($row) . ")' 
+                                                    <button onclick='editBatch(" . htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8') . ")' 
                                                             class='bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition-colors'>
                                                         <i class='fas fa-edit'></i> Edit
                                                     </button>
-                                                    <button onclick='deleteBatch(\"" . $row['batch_no_tbl'] . "\")' 
+                                                    <button onclick='deleteBatch(" . json_encode($row['batch_no_tbl']) . ")' 
                                                             class='bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors'>
                                                         <i class='fas fa-trash'></i> Delete
                                                     </button>
                                                 </div>
-                                              </td>";
+                                            </td>";
                                         echo "</tr>";
                                     }
                                 } else {
@@ -537,21 +553,6 @@ try {
                     </table>
                 </div>
 
-
-    <!-- Update the Recipe Detail Modal -->
-    <div id="recipeDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto">
-        <div class="bg-white rounded-lg max-w-3xl mx-auto my-8 p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-semibold text-gray-800" id="modalTitle"></h3>
-                <button onclick="closeRecipeDetail()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="space-y-6" id="modalContent">
-                <!-- Content will be populated by JavaScript -->
-            </div>
-        </div>
-    </div>
 
     <!-- Add Batch Edit Modal -->
     <div id="batchEditModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
@@ -665,64 +666,154 @@ try {
     </div>
 
     <script>
-    function calculateEditDefects() {
-        const target = parseInt(document.getElementById('edit_target_quantity').value) || 0;
-        const actual = parseInt(document.getElementById('edit_actual_quantity').value) || 0;
-        const defects = Math.max(0, target - actual);
-        document.getElementById('edit_defect_count').value = defects;
-    }
-
-    function countEditWorkers() {
-        const workerNames = document.getElementById('edit_worker_names').value;
-        const workerCount = workerNames ? workerNames.split(',').filter(name => name.trim() !== '').length : 0;
-        document.getElementById('edit_worker_count').value = workerCount;
-    }
-
-    function editBatch(batch) {
-        // Pre-fill all the fields with existing data
-        document.getElementById('edit_batch_id').value = batch.batch_no_tbl;
-        document.getElementById('edit_batch_no').value = batch.batch_no_tbl;
-        document.getElementById('edit_start_date').value = batch.startDate_tbl.slice(0, 16);
-        if (batch.endDate_tbl) {
-            document.getElementById('edit_end_date').value = batch.endDate_tbl.slice(0, 16);
+        
+        function deleteBatch(batchId) {
+            if (confirm('Are you sure you want to delete this batch?')) {
+                fetch('delete_batch.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `batch_id=${batchId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message 
+                        alert(data.message || 'Batch deleted successfully!');
+                        
+                        // Remove the batch element from the DOM or refresh the table
+                        const batchElement = document.querySelector(`[data-batch-id="${batchId}"]`);
+                        if (batchElement) {
+                            batchElement.remove();
+                        } else {
+                            // If DOM element not found, refresh the page
+                            window.location.reload();
+                        }
+                    } else {
+                        // Show error message
+                        throw new Error(data.error || 'Failed to delete batch');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting batch: ' + error.message);
+                });
+            }
         }
-        document.getElementById('edit_production_stage').value = batch.production_stage_tbl;
-        document.getElementById('edit_quality_check').value = batch.quality_check_tbl;
-        document.getElementById('edit_status').value = batch.status_tbl;
 
-        // Fill worker fields
-        document.getElementById('edit_worker_count').value = batch.worker_count || '';
-        document.getElementById('edit_worker_names').value = batch.worker_names || '';
+                    // Function to calculate defects in edit modal
+                    function calculateEditDefects() {
+                        const target = parseInt(document.getElementById('edit_target_quantity').value) || 0;
+                        const actual = parseInt(document.getElementById('edit_actual_quantity').value) || 0;
+                        const defects = Math.max(0, target - actual);
+                        document.getElementById('edit_defect_count').value = defects;
+                    }
 
-        // Fill quantity fields
-        document.getElementById('edit_target_quantity').value = batch.target_quantity || '';
-        document.getElementById('edit_actual_quantity').value = batch.actual_quantity || '';
-        document.getElementById('edit_defect_count').value = batch.defect_count || '';
+                    // Function to count workers in edit modal
+                    function countEditWorkers() {
+                        const workerNames = document.getElementById('edit_worker_names').value;
+                        const workerCount = workerNames ? workerNames.split(',').filter(name => name.trim() !== '').length : 0;
+                        document.getElementById('edit_worker_count').value = workerCount;
+                    }
 
-        // Fill quality check fields
-        document.getElementById('edit_temperature').value = batch.temperature || '';
-        document.getElementById('edit_moisture').value = batch.moisture || '';
-        document.getElementById('edit_weight').value = batch.weight || '';
+                    // Function to open edit modal with pre-filled batch data
+                    function editBatch(batch) {
+                        document.getElementById('edit_batch_id').value = batch.batch_no_tbl;
+                        document.getElementById('edit_batch_no').value = batch.batch_no_tbl;
+                        document.getElementById('edit_start_date').value = batch.startDate_tbl.slice(0, 16);
+                        if (batch.endDate_tbl) {
+                            document.getElementById('edit_end_date').value = batch.endDate_tbl.slice(0, 16);
+                        }
+                        document.getElementById('edit_production_stage').value = batch.production_stage_tbl;
+                        document.getElementById('edit_quality_check').value = batch.quality_check_tbl;
+                        document.getElementById('edit_status').value = batch.status_tbl;
 
-        // Show the modal
-        document.getElementById('batchEditModal').classList.remove('hidden');
+                        document.getElementById('edit_worker_count').value = batch.worker_count || '';
+                        document.getElementById('edit_worker_names').value = batch.worker_names || '';
+                        document.getElementById('edit_target_quantity').value = batch.target_quantity || '';
+                        document.getElementById('edit_actual_quantity').value = batch.actual_quantity || '';
+                        document.getElementById('edit_defect_count').value = batch.defect_count || '';
 
-        // Calculate defects
-        calculateEditDefects();
-    }
-    </script>
+                        document.getElementById('edit_temperature').value = batch.temperature || '';
+                        document.getElementById('edit_moisture').value = batch.moisture || '';
+                        document.getElementById('edit_weight').value = batch.weight || '';
 
-    </script>
+                        document.getElementById('batchEditModal').classList.remove('hidden');
+                        calculateEditDefects();
+                    }
+
+                    // Function to show specific content section
+                    function showSection(sectionId) {
+                        document.querySelectorAll('.content-section').forEach(section => {
+                            section.classList.add('hidden');
+                        });
+                        document.getElementById(`${sectionId}-section`).classList.remove('hidden');
+                    }
+
+                    // Function to show recipe details in modal
+                    function showRecipeDetail(recipe) {
+                        const modal = document.getElementById('recipeDetailModal');
+                        const modalContent = document.getElementById('modalContent');
+
+                        document.getElementById('modalTitle').textContent = recipe.recipe_name;
+
+                        
+                        modal.classList.remove('hidden');
+                    }
+
+                    // Function to close recipe modal
+                    function closeRecipeModal() {
+                        document.getElementById('recipeDetailModal').classList.add('hidden');
+                    }
+
+                    // Function to update batch status
+                    function updateBatchStatus(batchId, status) {
+                        if (confirm('Are you sure you want to update this batch status?')) {
+                            fetch('update_batch.php', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded'
+                                    },
+                                    body: `batch_id=${batchId}&status=${status}`
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        alert('Batch status updated successfully!');
+                                        location.reload();
+                                    } else {
+                                        alert('Error updating batch status');
+                                    }
+                                });
+                        }
+                    }
+
+                    // Event listeners for modal and ESC key
+                    window.onclick = function(event) {
+                        const batchModal = document.getElementById('batchEditModal');
+                        const recipeModal = document.getElementById('recipeDetailModal');
+                        if (event.target === batchModal) closeBatchModal();
+                        if (event.target === recipeModal) closeRecipeModal();
+                    };
+
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape') {
+                            if (!document.getElementById('recipeDetailModal').classList.contains('hidden')) closeRecipeModal();
+                            if (!document.getElementById('batchEditModal').classList.contains('hidden')) closeBatchModal();
+                        }
+                    });
+
+                    // Function to close batch modal
+                    function closeBatchModal() {
+                        document.getElementById('batchEditModal').classList.add('hidden');
+                    }
+        </script>
+
+    
 
     <script>
-    function showSection(sectionId) {
-    // Hide all sections
-    document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.add('hidden');
-    });
-    // Show selected section
-    document.getElementById(sectionId + '-section').classList.remove('hidden');
-}
+
 
 function showRecipeDetail(recipe) {
     const modal = document.getElementById('recipeDetailModal');
@@ -776,167 +867,8 @@ function showRecipeDetail(recipe) {
     modal.classList.remove('hidden');
 }
 
-function closeRecipeModal() {
-    document.getElementById('recipeDetailModal').classList.add('hidden');
+function closeRecipeDetail() {
+    const modal = document.getElementById('recipeDetailModal');
+    modal.classList.add('hidden');
 }
 </script>
-
-    function closeRecipeDetail() {
-        const modal = document.getElementById('recipeDetailModal');
-        modal.classList.add('hidden');
-    }
-
-    content.innerHTML = `
-        <div class="space-y-6">
-            <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="font-semibold text-lg mb-2 text-gray-800">Ingredients</h4>
-            <p class="text-gray-700">${recipe.ingredients}</p>
-            </div>
-            
-            <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="font-semibold text-lg mb-2 text-gray-800">Equipment Needed</h4>
-            <p class="text-gray-700">${recipe.equipment_tbl.replace(/\n/g, '<br>')}</p>
-            </div>
-            
-            <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="font-semibold text-lg mb-2 text-gray-800">Preparation Steps</h4>
-            <div class="text-gray-700 space-y-2">
-                ${recipe.preparation_step_tbl.split('\n').map((step, index) => 
-                `<p class="flex gap-2">
-                    <span class="font-medium text-pink-600">${index + 1}.</span>
-                    <span>${step}</span>
-                </p>`
-                ).join('')}
-            </div>
-            </div>
-            
-            <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="font-semibold text-lg mb-2 text-gray-800">Recipe Information</h4>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                <span class="text-gray-500">Recipe ID:</span>
-                <span class="text-gray-700 ml-2">#${recipe.recipe_id}</span>
-                </div>
-            </div>
-            </div>
-        </div>
-        `
-
-    // Add search functionality
-    document.getElementById('recipeSearch').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const recipeCards = document.querySelectorAll('.grid > div');
-        
-        recipeCards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(searchTerm) ? '' : 'none';
-        });
-    });
-
-    // Add sort functionality
-    document.getElementById('recipeSort').addEventListener('change', function(e) {
-        const sortBy = e.target.value;
-        const recipeCards = Array.from(document.querySelectorAll('.grid > div'));
-        const container = document.querySelector('.grid');
-        
-        recipeCards.sort((a, b) => {
-            const nameA = a.querySelector('h3').textContent.toLowerCase();
-            const nameB = b.querySelector('h3').textContent.toLowerCase();
-            
-            switch(sortBy) {
-                case 'name':
-                    return nameA.localeCompare(nameB);
-                case 'newest':
-                    return -1; // Assuming they're already sorted by newest
-                case 'oldest':
-                    return 1;  // Reverse the current order
-                default:
-                    return 0;
-            }
-        });
-        
-        container.innerHTML = '';
-        recipeCards.forEach(card => container.appendChild(card));
-    });
-
-    // Add this JavaScript function after your existing scripts
-    function updateBatchStatus(batchId, status) {
-        if(confirm('Are you sure you want to update this batch status?')) {
-            fetch('update_batch.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `batch_id=${batchId}&status=${status}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    alert('Batch status updated successfully!');
-                    location.reload();
-                } else {
-                    alert('Error updating batch status');
-                }
-            });
-        }
-    }
-
-    
-
-    function closeBatchModal() {
-        document.getElementById('batchEditModal').classList.add('hidden');
-    }
-
-    function deleteBatch(batchId) {
-        if(confirm('Are you sure you want to delete this batch?')) {
-            fetch('delete_batch.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `batch_id=${batchId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    alert('Batch deleted successfully!');
-                    location.reload();
-                } else {
-                    alert('Error deleting batch');
-                }
-            });
-        }
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const batchModal = document.getElementById('batchEditModal');
-        const recipeModal = document.getElementById('recipeDetailModal');
-        
-        if (event.target === batchModal) {
-            closeBatchModal();
-        }
-        if (event.target === recipeModal) {
-            closeRecipeDetail();
-        }
-    }
-
-    // Add this after your existing JavaScript
-    // Close modal when clicking outside
-    document.getElementById('recipeDetailModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeRecipeDetail();
-        }
-    });
-
-    // Close modal with ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !document.getElementById('recipeDetailModal').classList.contains('hidden')) {
-            closeRecipeDetail();
-        }
-    });
-    </script>
-</body>
-
-</html>
-

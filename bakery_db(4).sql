@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Jan 12, 2025 at 08:36 PM
+-- Generation Time: Jan 13, 2025 at 12:43 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -45,7 +45,8 @@ INSERT INTO `admin_db` (`admin_id`, `name_tbl`, `gender_tbl`, `role_tbl`, `email
 (2, 'CARROT', 'male', 'baker', 'carrottan@baker.com', '$2y$12$0b88et0uf8FFMul2czfXXOzZvkExZmmZaIB0ySoAWvcneOIQoM2/2'),
 (3, 'rhino', 'male', 'baker', 'A@baker.com', '$2y$12$JcrOSHv1Pn6uQMr7LzjN9uWhYyJzu.cVUhR6VvrfjlH6Dkluigthu'),
 (4, 'tan', 'male', 'baker', '111@gmail.com', '$2y$10$HfR5TrZVm3V6yD1zAmiTF.EyFRLd3R1aMN5kP0d.VG0BQrdC1pXCm'),
-(5, 'zczc', 'male', 'supervisor', '222@gmail.com', '$2y$10$iXx0mm3m8NMOr1UuU7qKyuABSOQb9yN74fQgz2WSHn7rXMpuhn3F.');
+(5, 'zczc', 'male', 'supervisor', '222@gmail.com', '$2y$10$iXx0mm3m8NMOr1UuU7qKyuABSOQb9yN74fQgz2WSHn7rXMpuhn3F.'),
+(6, 'aaa', 'male', 'baker', '333@gmail.com', '$2y$10$omgLa74HPCL6Tf0efjgEUeRyi035.NWPfd37ZTeX6qDIhfjdiZ5h.');
 
 -- --------------------------------------------------------
 
@@ -67,15 +68,10 @@ CREATE TABLE `batch_db` (
 --
 
 INSERT INTO `batch_db` (`batch_no_tbl`, `startDate_tbl`, `endDate_tbl`, `production_stage_tbl`, `quality_check_tbl`, `status_tbl`) VALUES
-('1222', '2024-12-26 19:42:00', '2024-12-26 02:43:00', 'Preparation', 'bad', 'Completed'),
-('1233333333', '2024-12-10 15:09:00', '2024-12-30 15:09:00', 'preparation', 'Temperature: 23°C\nMoisture: 22%\nWeight: 100g\nVisual Checks: texture\nNotes: good', 'Scheduled'),
-('2147483647', '2024-12-03 02:53:00', '2025-01-09 02:54:00', 'cooling', 'kkk', 'In Progress'),
-('6666', '2024-12-06 02:46:00', '2024-12-28 02:46:00', 'preparation', '6', 'Completed'),
-('666633777', '2024-12-18 02:53:00', '2024-12-13 02:53:00', 'baking', 'k', 'Scheduled'),
-('66667777777777777', '2024-12-11 15:05:00', '2024-12-28 15:05:00', 'preparation', '', 'In Progress'),
-('6669', '2024-12-02 03:15:00', '2024-12-29 03:16:00', 'mixing', 'hh', 'Completed'),
-('asd1', '2024-12-05 16:18:00', '2024-12-31 19:15:00', 'mixing', 'Temperature: 22°C\nMoisture: 21%\nWeight: 12g\nVisual Checks: texture\nNotes: good', 'Scheduled'),
-('123', '2025-01-12 19:07:00', '2025-01-12 05:09:00', 'Mixing', 'aaa', 'Completed');
+('123', '2025-01-12 19:07:00', '2025-01-12 05:09:00', 'Mixing', 'aaa', 'Completed'),
+('111', '2025-01-13 20:38:00', '2025-01-13 19:40:00', 'Preparation', '', 'In Progress'),
+('654', '2025-01-13 20:39:00', '2025-01-16 19:39:00', 'Cooling', 'the texture is good', 'In Progress'),
+('842', '2025-01-20 19:40:00', '2025-01-22 19:40:00', 'Baking', 'everything is perfect', 'Completed');
 
 -- --------------------------------------------------------
 
@@ -100,7 +96,10 @@ CREATE TABLE `batch_reports` (
 --
 
 INSERT INTO `batch_reports` (`batch_no`, `worker_count`, `worker_names`, `temperature`, `moisture`, `weight`, `target_quantity`, `actual_quantity`, `defect_count`) VALUES
-(123, 7, 'a,b,c,d,e,f,g', 100.00, 55.00, 55.00, 50, 25, 25);
+(123, 7, 'a,b,c,d,e,f,g', 100.00, 55.00, 55.00, 50, 25, 25),
+(111, 5, 'ali, abu, atan, jess, nanny', 100.00, 99.00, 2314.00, 676, 452, 224),
+(654, 4, 'murugan, lim, tan, harith', 98.00, 100.00, 8542.00, 1111, 987, 124),
+(842, 4, 'terry, marcus, bob, syasya', 100.00, 100.00, 5444.00, 1555, 1532, 23);
 
 -- --------------------------------------------------------
 
@@ -122,17 +121,17 @@ CREATE TABLE `equipment_status` (
 --
 
 INSERT INTO `equipment_status` (`equipment_id`, `equipment_name`, `status`, `last_updated`, `notes`, `maintenance_schedule`) VALUES
-(1, 'Mixer A', 'In Use', '2025-01-12 16:59:26', NULL, NULL),
-(2, 'Oven 1', 'In Use', '2025-01-12 16:46:49', NULL, NULL),
-(3, 'Cooling Rack', 'Maintenance', '2025-01-09 07:09:08', NULL, NULL),
-(4, 'Industrial Mixer', 'In Use', '2025-01-12 18:28:01', NULL, NULL),
-(5, 'Commercial Oven', 'In Use', '2025-01-10 06:45:43', NULL, NULL),
-(6, 'Dough Sheeter', 'Available', '2025-01-09 07:57:49', NULL, NULL),
+(1, 'Mixer A', 'In Use', '2025-01-13 09:01:54', NULL, NULL),
+(2, 'Oven 1', 'In Use', '2025-01-13 09:01:54', NULL, NULL),
+(3, 'Cooling Rack', 'Available', '2025-01-13 09:58:34', NULL, NULL),
+(4, 'Industrial Mixer', 'In Use', '2025-01-13 09:30:46', NULL, NULL),
+(5, 'Commercial Oven', 'In Use', '2025-01-13 09:34:41', NULL, NULL),
+(6, 'Dough Sheeter', 'In Use', '2025-01-13 09:35:57', NULL, NULL),
 (7, 'Proofing Cabinet', 'Available', '2025-01-09 07:57:49', NULL, NULL),
-(8, 'Cooling Racks', 'Available', '2025-01-09 07:57:49', NULL, NULL),
-(9, 'Baking Pans', 'In Use', '2025-01-10 12:32:44', NULL, NULL),
-(10, 'Stand Mixer', 'Available', '2025-01-09 07:57:49', NULL, NULL),
-(11, 'Hand Tools', 'In Use', '2025-01-10 06:48:56', NULL, NULL);
+(8, 'Cooling Racks', 'Available', '2025-01-13 09:15:54', NULL, NULL),
+(9, 'Baking Pans', 'In Use', '2025-01-13 09:33:07', NULL, NULL),
+(10, 'Stand Mixer', 'In Use', '2025-01-13 09:37:33', NULL, NULL),
+(11, 'Hand Tools', 'Available', '2025-01-13 08:29:24', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -160,8 +159,9 @@ CREATE TABLE `production_db` (
 
 INSERT INTO `production_db` (`production_id`, `order_volume`, `capacity`, `staff_availability`, `equipment_id`, `recipe_id`, `production_date`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
 (14, 25, 5, '2', 2, 8, '2025-01-16', 5, NULL, '2025-01-13 02:05:32', '2025-01-13 02:05:32'),
-(15, 500, 25, '4', 4, 10, '2025-01-22', 5, NULL, '2025-01-13 02:28:27', '2025-01-13 02:28:27'),
-(16, 1000, 100, '3', 4, 10, '2025-01-14', 5, NULL, '2025-01-13 02:28:56', '2025-01-13 02:28:56');
+(20, 111, 111, '3', 2, 8, '2025-01-08', 5, NULL, '2025-01-13 16:57:40', '2025-01-13 16:57:40'),
+(22, 1000, 95, '2', 9, 2, '2025-01-14', 5, NULL, '2025-01-13 19:42:13', '2025-01-13 19:42:13'),
+(23, 2222, 152, '3', 6, 4, '2025-01-16', 5, NULL, '2025-01-13 19:42:30', '2025-01-13 19:42:30');
 
 -- --------------------------------------------------------
 
@@ -214,19 +214,41 @@ CREATE TABLE `recipe_db` (
 --
 
 INSERT INTO `recipe_db` (`recipe_id`, `recipe_name`, `preparation_step_tbl`, `equipment_tbl`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
+(1, 'Pandan Kaya Cake', '1. Preheat oven to 350°F (180°C).\n2. Blend pandan leaves with water and strain to extract juice.\n3. Mix dry ingredients in a bowl (flour, sugar, baking powder, salt).\n4. In a separate bowl, combine coconut milk, pandan juice, oil, and eggs.\n5. Gradually mix the wet ingredients into the dry ingredients.\n6. Pour batter into a greased cake pan and bake for 25-30 minutes.\n7. Once cool, spread kaya between layers or on top.', 'Industrial Mixer', NULL, 5, '2025-01-13 17:25:51', '2025-01-13 17:30:46'),
+(2, 'Kuih Bahulu', '1. Preheat oven to 375°F (190°C).\n2. Whisk eggs and sugar until pale and fluffy.\n3. Fold in sifted flour and vanilla extract gently.\n4. Grease kuih bahulu molds and fill them with batter.\n5. Bake for 10-15 minutes until golden.', 'Baking Pans', NULL, 5, '2025-01-13 17:25:51', '2025-01-13 17:33:07'),
+(3, 'Coconut Buns (Roti Kelapa)', '1. Mix bread flour, yeast, sugar, and salt in a bowl.\n2. Add coconut milk and egg, knead until dough forms.\n3. Knead in butter until smooth and elastic.\n4. Let dough proof for 1 hour until doubled.\n5. Mix grated coconut and brown sugar for the filling.\n6. Divide dough into balls, fill with coconut filling, and shape.\n7. Let buns proof for 30 minutes, then bake at 375°F (190°C) for 15-20 minutes.', 'Commercial Oven', NULL, 5, '2025-01-13 17:25:51', '2025-01-13 17:34:41'),
+(4, 'Pineapple Tarts (Tart Nanas)', '1. Mix flour, sugar, and butter until crumbly.\n2. Add egg yolk and cold water, knead until a dough forms.\n3. Chill dough for 30 minutes.\n4. Roll out dough and cut into small circles or rectangles.\n5. Add pineapple jam and shape into tarts.\n6. Bake at 350°F (180°C) for 15-20 minutes.', 'Dough Sheeter', NULL, 5, '2025-01-13 17:25:51', '2025-01-13 17:35:57'),
+(5, 'Apam Balik', '1. Mix flour, baking powder, and sugar in a bowl.\n2. Add egg and milk, whisking until smooth.\n3. Heat a non-stick pan over medium heat.\n4. Pour batter to form a thick pancake.\n5. Sprinkle crushed peanuts, sugar, and creamed corn on top.\n6. Fold pancake in half and serve warm.', 'Stand Mixer', NULL, 5, '2025-01-13 17:25:51', '2025-01-13 17:37:33'),
 (8, 'Chocolate Ganache Cupcakes', '1. Preheat oven to 350°F (180°C).\n2. Combine dry ingredients (flour, sugar, cocoa powder, baking powder) in a bowl.\n3. Mix wet ingredients (eggs, milk, melted butter) in a separate bowl.\n4. Gradually combine wet and dry mixtures.\n5. Pour batter into cupcake liners and bake for 18-20 minutes.\n6. For ganache: Heat heavy cream and pour over chocolate chips, stirring until smooth.\n7. Let cupcakes cool, then frost with ganache.', 'Oven 1', 5, 5, '2025-01-13 00:46:49', '2025-01-13 00:46:49'),
-(9, 'Sourdough Loaf', '1. Mix flour, water, and sourdough starter in a bowl and let it autolyse for 30 minutes.\n2. Add salt and knead until smooth.\n3. Perform stretch-and-folds over 4 hours, every 30 minutes.\n4. Shape dough into a loaf and place it in a proofing basket.\n5. Let it proof overnight in the fridge.\n6. Preheat oven with a Dutch oven inside to 475°F (245°C).\n7. Transfer dough to oven, score, and bake covered for 20 minutes, then uncovered for another 20 minutes.', 'Mixer A', 5, 5, '2025-01-13 00:59:26', '2025-01-13 00:59:26'),
-(10, 'Pandan Kaya Cake', '1. Preheat oven to 350°F (180°C).\n2. Blend pandan leaves with water and strain to extract juice.\n3. Mix dry ingredients in a bowl (flour, sugar, baking powder, salt).\n4. In a separate bowl, combine coconut milk, pandan juice, oil, and eggs.\n5. Gradually mix the wet ingredients into the dry ingredients.\n6. Pour batter into a greased cake pan and bake for 25-30 minutes.\n7. Once cool, spread kaya between layers or on top.', 'Industrial Mixer', 5, 5, '2025-01-13 02:28:01', '2025-01-13 02:28:01');
+(9, 'Sourdough Loaf', '1. Mix flour, water, and sourdough starter in a bowl and let it autolyse for 30 minutes.\n2. Add salt and knead until smooth.\n3. Perform stretch-and-folds over 4 hours, every 30 minutes.\n4. Shape dough into a loaf and place it in a proofing basket.\n5. Let it proof overnight in the fridge.\n6. Preheat oven with a Dutch oven inside to 475°F (245°C).\n7. Transfer dough to oven, score, and bake covered for 20 minutes, then uncovered for another 20 minutes.', 'Mixer A', 5, 5, '2025-01-13 00:59:26', '2025-01-13 00:59:26');
 
 --
 -- Triggers `recipe_db`
 --
 DELIMITER $$
 CREATE TRIGGER `update_equipment_status` AFTER INSERT ON `recipe_db` FOR EACH ROW BEGIN
-    -- Update the equipment status to 'In Use' when equipment is assigned
     UPDATE equipment_status
     SET status = 'In Use'
     WHERE equipment_name = NEW.equipment_tbl;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `update_equipment_status_on_update` AFTER UPDATE ON `recipe_db` FOR EACH ROW BEGIN
+    IF OLD.equipment_tbl != NEW.equipment_tbl THEN
+        UPDATE equipment_status
+        SET status = 'Available'
+        WHERE equipment_name = OLD.equipment_tbl
+        AND NOT EXISTS (
+            SELECT 1 FROM recipe_db 
+            WHERE equipment_tbl = OLD.equipment_tbl 
+            AND recipe_id != NEW.recipe_id
+        );
+        
+        UPDATE equipment_status
+        SET status = 'In Use'
+        WHERE equipment_name = NEW.equipment_tbl;
+    END IF;
 END
 $$
 DELIMITER ;
@@ -261,12 +283,32 @@ INSERT INTO `recipe_ingredients` (`ingredient_id`, `recipe_id`, `ingredient_name
 (22, 9, 'Active Sourdough Starter', 100.00, 'g'),
 (23, 9, 'Water', 350.00, 'ml'),
 (24, 9, 'Salt', 2.00, 'tsp'),
-(25, 10, 'All-purpose flour', 310.00, 'g'),
-(26, 10, 'Granulated Sugar', 200.00, 'g'),
-(27, 10, 'Baking Powder', 1.00, 'tsp'),
-(28, 10, 'Coconut Milk', 240.00, 'ml'),
-(29, 10, 'Pandan Juice', 120.00, 'ml'),
-(30, 10, 'Eggs', 4.00, 'pcs');
+(94, 1, 'All-purpose flour', 3.00, 'cups'),
+(95, 1, 'Granulated sugar', 1.00, 'cups'),
+(96, 1, 'Baking powder', 1.00, 'tsp'),
+(97, 1, 'Salt', 1.00, 'tsp'),
+(98, 1, 'Coconut milk', 1.00, 'cups'),
+(99, 2, 'All-purpose flour', 1.00, 'cups'),
+(100, 2, 'Eggs', 4.00, 'pcs'),
+(101, 2, 'Granulated sugar', 1.00, 'cups'),
+(102, 2, 'Vanilla extract', 1.00, 'tsp'),
+(103, 3, 'Bread flour', 3.00, 'cups'),
+(104, 3, 'Instant yeast', 2.00, 'tsp'),
+(105, 3, 'Granulated sugar', 3.00, 'tbsp'),
+(106, 3, 'Coconut milk', 1.00, 'cups'),
+(107, 4, 'All-purpose flour', 2.00, 'cups'),
+(108, 4, 'Unsalted butter', 1.00, 'cups'),
+(109, 4, 'Egg yolk', 1.00, 'pcs'),
+(110, 4, 'Granulated sugar', 2.00, 'tbsp'),
+(111, 4, 'Cold water', 2.00, 'tbsp'),
+(112, 4, 'Pineapple jam', 1.00, 'cups'),
+(113, 5, 'All-purpose flour', 1.00, 'cups'),
+(114, 5, 'Baking powder', 1.00, 'tsp'),
+(115, 5, 'Sugar', 2.00, 'tbsp'),
+(116, 5, 'Egg', 1.00, 'pcs'),
+(117, 5, 'Milk', 1.00, 'cups'),
+(118, 5, 'Crushed peanuts', 1.00, 'cups'),
+(119, 5, 'Granulated sugar', 1.00, 'cups');
 
 --
 -- Indexes for dumped tables
@@ -331,7 +373,7 @@ ALTER TABLE `recipe_ingredients`
 -- AUTO_INCREMENT for table `admin_db`
 --
 ALTER TABLE `admin_db`
-  MODIFY `admin_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `admin_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `equipment_status`
@@ -343,7 +385,7 @@ ALTER TABLE `equipment_status`
 -- AUTO_INCREMENT for table `production_db`
 --
 ALTER TABLE `production_db`
-  MODIFY `production_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `production_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `production_schedule`
@@ -361,13 +403,13 @@ ALTER TABLE `production_staff_assignment`
 -- AUTO_INCREMENT for table `recipe_db`
 --
 ALTER TABLE `recipe_db`
-  MODIFY `recipe_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `recipe_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `recipe_ingredients`
 --
 ALTER TABLE `recipe_ingredients`
-  MODIFY `ingredient_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `ingredient_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
 
 --
 -- Constraints for dumped tables
