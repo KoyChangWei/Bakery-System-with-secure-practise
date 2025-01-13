@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Jan 13, 2025 at 12:43 PM
+-- Generation Time: Jan 13, 2025 at 07:28 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -60,18 +60,17 @@ CREATE TABLE `batch_db` (
   `endDate_tbl` datetime NOT NULL,
   `production_stage_tbl` varchar(255) NOT NULL,
   `quality_check_tbl` varchar(255) NOT NULL,
-  `status_tbl` varchar(255) NOT NULL
+  `status_tbl` varchar(255) NOT NULL,
+  `production_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `batch_db`
 --
 
-INSERT INTO `batch_db` (`batch_no_tbl`, `startDate_tbl`, `endDate_tbl`, `production_stage_tbl`, `quality_check_tbl`, `status_tbl`) VALUES
-('123', '2025-01-12 19:07:00', '2025-01-12 05:09:00', 'Mixing', 'aaa', 'Completed'),
-('111', '2025-01-13 20:38:00', '2025-01-13 19:40:00', 'Preparation', '', 'In Progress'),
-('654', '2025-01-13 20:39:00', '2025-01-16 19:39:00', 'Cooling', 'the texture is good', 'In Progress'),
-('842', '2025-01-20 19:40:00', '2025-01-22 19:40:00', 'Baking', 'everything is perfect', 'Completed');
+INSERT INTO `batch_db` (`batch_no_tbl`, `startDate_tbl`, `endDate_tbl`, `production_stage_tbl`, `quality_check_tbl`, `status_tbl`, `production_id`) VALUES
+('132', '2025-01-14 01:15:00', '2025-01-14 01:16:00', 'Preparation', '', 'In Progress', 23),
+('1233', '2025-01-14 01:17:00', '2025-01-15 01:17:00', 'Mixing', '', 'Completed', 22);
 
 -- --------------------------------------------------------
 
@@ -96,10 +95,8 @@ CREATE TABLE `batch_reports` (
 --
 
 INSERT INTO `batch_reports` (`batch_no`, `worker_count`, `worker_names`, `temperature`, `moisture`, `weight`, `target_quantity`, `actual_quantity`, `defect_count`) VALUES
-(123, 7, 'a,b,c,d,e,f,g', 100.00, 55.00, 55.00, 50, 25, 25),
-(111, 5, 'ali, abu, atan, jess, nanny', 100.00, 99.00, 2314.00, 676, 452, 224),
-(654, 4, 'murugan, lim, tan, harith', 98.00, 100.00, 8542.00, 1111, 987, 124),
-(842, 4, 'terry, marcus, bob, syasya', 100.00, 100.00, 5444.00, 1555, 1532, 23);
+(132, 1, 'rhino', 222.00, 222.00, 222.00, 2222, 222, 2000),
+(1233, 1, 'CARROT', 12.00, 23.00, 323.00, 1000, 124, 876);
 
 -- --------------------------------------------------------
 
