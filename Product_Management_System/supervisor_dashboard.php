@@ -396,8 +396,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
                                 COALESCE(
                                     CASE 
                                         WHEN EXISTS (
-                                            SELECT 1 FROM recipe_db 
-                                            WHERE recipe_db.equipment_tbl = es.equipment_name
+                                            SELECT 1 FROM recipe_db r
+                                            WHERE r.equipment_tbl = es.equipment_name
+                                            AND r.recipe_id != COALESCE(?, 0)
                                         ) THEN 'In Use'
                                         ELSE es.status
                                     END, 'Available'
@@ -405,7 +406,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'supervisor') {
                             FROM equipment_status es
                             ORDER BY es.equipment_name";
 
-                        $equipment_result = $conn->query($equipment_sql);
+                        $stmt = $conn->prepare($equipment_sql);
+                        $recipe_id = isset($_GET['id']) ? $_GET['id'] : 0;
+                        $stmt->bind_param('i', $recipe_id);
+                        $stmt->execute();
+                        $equipment_result = $stmt->get_result();
+
                         while ($equip = $equipment_result->fetch_assoc()) {
                             $status = $equip['current_status'] !== 'Available' ? " ({$equip['current_status']})" : '';
                             $disabled = $equip['current_status'] !== 'Available' ? 'disabled' : '';
@@ -667,6 +673,9 @@ function editSchedule(scheduleId) {
             const ingredientsContainer = document.getElementById('ingredients-container');
             const stepsContainer = document.getElementById('steps-container');
 
+            // Set form mode
+            form.setAttribute('data-mode', recipe ? 'edit' : 'create');
+
             if (ingredientsContainer) {
                 ingredientsContainer.innerHTML = createIngredientRow();
             }
@@ -692,8 +701,8 @@ function editSchedule(scheduleId) {
                 const equipmentSelect = document.getElementById('equipment');
                 if (equipmentSelect && recipe.equipment_tbl) {
                     equipmentSelect.value = recipe.equipment_tbl;
-                    }
-                } else {
+                }
+            } else {
                 // Adding new recipe
                 document.getElementById('recipe_id').value = '';
             }
