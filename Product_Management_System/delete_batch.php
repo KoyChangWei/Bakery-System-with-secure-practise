@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ob_clean();
         echo json_encode(['success' => false, 'error' => 'Unauthorized access']);
         exit;
-    }
+    } 
 
     // Validate batch_id
     if (empty($_POST['batch_id'])) {
