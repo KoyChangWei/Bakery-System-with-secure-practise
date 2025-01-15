@@ -7,9 +7,15 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Set JSON header
+header('Content-Type: application/json');
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['user_role'] == 'baker') {
     try {
         $conn->begin_transaction();
+        
+        // Calculate worker count from worker names
+        $worker_count = !empty($_POST['worker_names']) ? count(array_filter(explode(',', $_POST['worker_names']))) : 0;
         
         // Update batch_db
         $sql = "UPDATE batch_db SET 
@@ -48,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['user_role'] == 'baker') {
                            
             $stmt = $conn->prepare($report_sql);
             $stmt->bind_param("issssiiis",
-                $_POST['worker_count'],
+                $worker_count,  // Use calculated worker count
                 $_POST['worker_names'],
                 $_POST['temperature'],
                 $_POST['moisture'],
@@ -61,10 +67,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['user_role'] == 'baker') {
             
             if ($stmt->execute()) {
                 $conn->commit();
-                echo "<script>
-                        alert('Batch updated successfully!');
-                        window.location.href='baker_dashboard.php#batch';
-                      </script>";
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Batch updated successfully'
+                ]);
             } else {
                 throw new Exception("Failed to update batch report: " . $stmt->error);
             }
@@ -76,10 +82,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['user_role'] == 'baker') {
         
     } catch (Exception $e) {
         $conn->rollback();
-        echo "<script>
-                alert('Error updating batch: " . $e->getMessage() . "');
-                window.location.href='baker_dashboard.php#batch';
-              </script>";
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error updating batch: ' . $e->getMessage()
+        ]);
     }
 }
 

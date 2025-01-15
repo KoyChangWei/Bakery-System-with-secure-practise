@@ -6,56 +6,66 @@ header('Content-Type: application/json');
 
 try {
     $production_date = $_GET['production_date'] ?? date('Y-m-d');
+    $exclude_id = $_GET['exclude_id'] ?? null;
     $recipe_id = $_GET['recipe_id'] ?? null;
     
-    if (!$recipe_id) {
-        throw new Exception("Recipe ID is required");
+    // Base query to get equipment
+    $sql = "SELECT e.equipment_id, e.equipment_name 
+            FROM equipment_status e
+            WHERE 1=1";
+    
+    $params = [];
+    $types = "";
+    
+    // If we have a recipe_id, filter by recipe's required equipment
+    if ($recipe_id) {
+        $sql .= " AND e.equipment_name IN (
+            SELECT equipment_tbl FROM recipe_db WHERE recipe_id = ?
+        )";
+        $params[] = $recipe_id;
+        $types .= "i";
     }
-
-    // First get the equipment required for this recipe
-    $sql = "SELECT equipment_tbl FROM recipe_db WHERE recipe_id = ?";
+    
+    // Exclude currently used equipment for the date, except the excluded ID
+    $sql .= " AND (e.equipment_id NOT IN (
+        SELECT equipment_id 
+        FROM production_db 
+        WHERE production_date = ?";
+    
+    if ($exclude_id) {
+        $sql .= " AND equipment_id != ?";
+        $params[] = $exclude_id;
+        $types .= "i";
+    }
+    
+    $sql .= ") OR e.equipment_id = ?)";
+    
+    $params = array_merge([$production_date], $params);
+    $types = "s" . $types;
+    
+    if ($exclude_id) {
+        $params[] = $exclude_id;
+        $types .= "i";
+    }
+    
+    $sql .= " ORDER BY e.equipment_name";
+    
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $recipe_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $recipe = $result->fetch_assoc();
-
-    if (!$recipe) {
-        throw new Exception("Recipe not found");
+    if (!$stmt) {
+        throw new Exception("Failed to prepare statement: " . $conn->error);
     }
-
-    // Get the equipment that's both required for the recipe and available
-    $equipment_list = explode(',', $recipe['equipment_tbl']);
-    $placeholders = str_repeat('?,', count($equipment_list) - 1) . '?';
     
-    $sql = "SELECT equipment_id, equipment_name 
-            FROM equipment_status 
-            WHERE equipment_name IN ($placeholders)
-            AND status = 'Available'
-            AND equipment_id NOT IN (
-                SELECT equipment_id 
-                FROM production_db 
-                WHERE production_date = ?
-            )
-            ORDER BY equipment_name";
-
-    $stmt = $conn->prepare($sql);
-    
-    // Create array of parameters for bind_param
-    $types = str_repeat('s', count($equipment_list)) . 's'; // all strings plus one for date
-    $params = array_merge($equipment_list, [$production_date]);
-    
-    // Bind parameters dynamically
-    $bind_params = array($types);
-    foreach ($params as $key => $value) {
-        $bind_params[] = &$params[$key];
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
     }
-    call_user_func_array(array($stmt, 'bind_param'), $bind_params);
-
-    $stmt->execute();
-    $result = $stmt->get_result();
     
+    if (!$stmt->execute()) {
+        throw new Exception("Failed to execute query: " . $stmt->error);
+    }
+    
+    $result = $stmt->get_result();
     $equipment = [];
+    
     while ($row = $result->fetch_assoc()) {
         $equipment[] = [
             'equipment_id' => $row['equipment_id'],
@@ -65,11 +75,11 @@ try {
 
     echo json_encode([
         'success' => true,
-        'data' => $equipment,
-        'recipe_equipment' => $recipe['equipment_tbl']
+        'data' => $equipment
     ]);
 
 } catch (Exception $e) {
+    error_log("Error in get_available_equipment.php: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage()

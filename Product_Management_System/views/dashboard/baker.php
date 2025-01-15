@@ -1,6 +1,10 @@
 <?php
 session_start();
 require_once '../../includes/db_connect.php';
+require_once '../../includes/security.php';
+
+// Initialize Security class
+$security = new Security();
 
 // Check if user is logged in and is a baker
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'baker') {
@@ -8,11 +12,29 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'baker') {
     exit();
 }
 
-// Get user details
+// Prevent session fixation
+session_regenerate_id(true);
+
+// Get user details with prepared statement
 $user_id = $_SESSION['user_id'];
-$sql = "SELECT * FROM admin_db WHERE admin_id = $user_id";
-$result = $conn->query($sql);
+$stmt = $conn->prepare("SELECT * FROM admin_db WHERE admin_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 $user = $result->fetch_assoc();
+$stmt->close();
+
+if (!$user) {
+    session_destroy();
+    header("Location: ../../login.html");
+    exit();
+}
+
+// Set security headers
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+header("X-Content-Type-Options: nosniff");
+header("Content-Security-Policy: default-src 'self' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com;");
 ?>
 
 <!DOCTYPE html>
@@ -74,41 +96,74 @@ $user = $result->fetch_assoc();
                 <!-- Recipe Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <?php
-                    $recipe_sql = "SELECT * FROM recipe_db ORDER BY ingredient_id DESC";
-                    $recipe_result = $conn->query($recipe_sql);
-                    
-                    if ($recipe_result->num_rows > 0) {
-                        while($row = $recipe_result->fetch_assoc()) {
-                            ?>
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div class="p-6">
-                                    <h3 class="text-xl font-semibold mb-2">
-                                        <?php echo htmlspecialchars($row['ingredient_name_tbl']); ?>
-                                    </h3>
-                                    <div class="mb-4">
-                                        <span class="text-sm font-medium text-gray-500">Quantity:</span>
-                                        <span class="ml-2"><?php echo htmlspecialchars($row['quantity_tbl']); ?></span>
+                    try {
+                        $recipe_sql = "SELECT r.*, GROUP_CONCAT(i.ingredient_name SEPARATOR ', ') AS ingredients
+                                     FROM recipe_db r
+                                     LEFT JOIN recipe_ingredients i ON r.recipe_id = i.recipe_id
+                                     GROUP BY r.recipe_id
+                                     ORDER BY r.created_at DESC";
+                        $stmt = $conn->prepare($recipe_sql);
+                        $stmt->execute();
+                        $recipe_result = $stmt->get_result();
+                        
+                        if ($recipe_result->num_rows > 0) {
+                            while($row = $recipe_result->fetch_assoc()) {
+                                // Sanitize all data before output
+                                $recipe_name = $security->sanitizeInput($row['recipe_name']);
+                                $recipe_id = (int)$row['recipe_id'];
+                                $equipment = $security->sanitizeInput($row['equipment_tbl']);
+                                $ingredients = $security->sanitizeInput($row['ingredients']);
+                                $preparation_steps = $security->sanitizeInput($row['preparation_step_tbl']);
+                                
+                                // Encode data for JavaScript
+                                $recipe_json = $security->jsonEncode([
+                                    'recipe_id' => $recipe_id,
+                                    'recipe_name' => $recipe_name,
+                                    'equipment_tbl' => $equipment,
+                                    'ingredients' => $ingredients,
+                                    'preparation_step_tbl' => $preparation_steps,
+                                    'created_at' => $row['created_at']
+                                ]);
+                                ?>
+                                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                                    <div class="p-6">
+                                        <div class="flex justify-between items-start mb-4">
+                                            <h3 class="text-xl font-semibold text-gray-800">
+                                                <?php echo $recipe_name; ?>
+                                            </h3>
+                                            <span class="bg-pink-100 text-pink-800 text-xs px-2 py-1 rounded-full flex-shrink-0">
+                                                Recipe #<?php echo $recipe_id; ?>
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="space-y-4">
+                                            <div>
+                                                <h4 class="text-sm font-medium text-gray-500">Ingredients:</h4>
+                                                <p class="text-gray-800 line-clamp-2"><?php echo $ingredients; ?></p>
+                                            </div>
+                                            
+                                            <div>
+                                                <h4 class="text-sm font-medium text-gray-500">Equipment Needed:</h4>
+                                                <p class="text-gray-800 line-clamp-2"><?php echo nl2br($equipment); ?></p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="mb-4">
-                                        <span class="text-sm font-medium text-gray-500">Equipment Needed:</span>
-                                        <p class="mt-1 text-gray-600"><?php echo nl2br(htmlspecialchars($row['equipment_tbl'])); ?></p>
-                                    </div>
-                                    <div>
-                                        <span class="text-sm font-medium text-gray-500">Preparation Steps:</span>
-                                        <p class="mt-1 text-gray-600"><?php echo nl2br(htmlspecialchars($row['preparation_step_tbl'])); ?></p>
+                                    <div class="bg-gray-50 px-6 py-3">
+                                        <button class="text-pink-600 hover:text-pink-700" 
+                                                onclick="showRecipeDetail(<?php echo $recipe_json; ?>)">
+                                            View Details <i class="fas fa-chevron-right ml-1"></i>
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="bg-gray-50 px-6 py-3">
-                                    <button class="text-pink-600 hover:text-pink-700" 
-                                            onclick="showRecipeDetail('<?php echo htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>')">
-                                        View Details <i class="fas fa-chevron-right ml-1"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <?php
+                                <?php
+                            }
+                        } else {
+                            echo "<div class='col-span-full text-center text-gray-500'>No recipes available</div>";
                         }
-                    } else {
-                        echo "<div class='col-span-full text-center text-gray-500'>No recipes available</div>";
+                        $stmt->close();
+                    } catch (Exception $e) {
+                        error_log("Error in baker dashboard: " . $e->getMessage());
+                        echo "<div class='col-span-full text-center text-red-500'>Error loading recipes. Please try again later.</div>";
                     }
                     ?>
                 </div>
@@ -157,11 +212,11 @@ $user = $result->fetch_assoc();
         const title = document.getElementById('modalTitle');
         const content = document.getElementById('modalContent');
 
-        title.textContent = recipe.ingredient_name_tbl;
+        title.textContent = recipe.recipe_name;
         content.innerHTML = `
             <div class="bg-gray-50 p-4 rounded-lg">
-                <h4 class="font-semibold text-lg mb-2">Quantity</h4>
-                <p>${recipe.quantity_tbl}</p>
+                <h4 class="font-semibold text-lg mb-2">Ingredients</h4>
+                <p>${recipe.ingredients}</p>
             </div>
             <div class="bg-gray-50 p-4 rounded-lg">
                 <h4 class="font-semibold text-lg mb-2">Equipment Needed</h4>

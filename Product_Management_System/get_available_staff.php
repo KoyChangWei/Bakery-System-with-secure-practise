@@ -12,8 +12,9 @@ header('Content-Type: application/json');
 try {
     // Get the selected production date
     $production_date = $_GET['production_date'] ?? date('Y-m-d');
-    
-    // Get all bakers who are NOT already assigned to any production on the selected date
+    $exclude_ids = isset($_GET['exclude_ids']) ? explode(',', $_GET['exclude_ids']) : [];
+
+    // Base query to get available staff
     $sql = "SELECT DISTINCT a.admin_id, a.name_tbl 
             FROM admin_db a
             WHERE a.role_tbl = 'baker' 
@@ -27,22 +28,25 @@ try {
                 ) numbers
                 WHERE p.production_date = ?
                 AND LENGTH(p.staff_availability) - LENGTH(REPLACE(p.staff_availability, ',', '')) >= numbers.position - 1
-            )
-            ORDER BY a.name_tbl";
-    
+            )";
+
+    // Add exclusion for already selected staff
+    if (!empty($exclude_ids)) {
+        $sql .= " AND a.admin_id NOT IN (" . str_repeat('?,', count($exclude_ids) - 1) . "?)";
+    }
+
+    $sql .= " ORDER BY a.name_tbl";
+
     $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        throw new Exception("Prepare failed: " . $conn->error);
-    }
-
-    $stmt->bind_param("s", $production_date);
     
-    if (!$stmt->execute()) {
-        throw new Exception("Execute failed: " . $stmt->error);
-    }
-
+    // Bind parameters
+    $types = "s" . str_repeat("s", count($exclude_ids));
+    $params = array_merge([$production_date], $exclude_ids);
+    
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
     $result = $stmt->get_result();
-    
+
     $staff = [];
     while ($row = $result->fetch_assoc()) {
         $staff[] = [
@@ -51,21 +55,13 @@ try {
         ];
     }
 
-    error_log("Date: " . $production_date);
-    error_log("Found " . count($staff) . " available staff members");
-    error_log("Staff data: " . print_r($staff, true));
-
     echo json_encode([
         'success' => true,
-        'data' => $staff,
-        'debug' => [
-            'date' => $production_date,
-            'count' => count($staff)
-        ]
+        'data' => $staff
     ]);
 
 } catch (Exception $e) {
-    error_log("Error in get_available_staff: " . $e->getMessage());
+    error_log("Error in get_available_staff.php: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage()
@@ -73,4 +69,3 @@ try {
 }
 
 $conn->close();
-?>
