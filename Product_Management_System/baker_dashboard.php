@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once 'db_connect.php';
-
+echo '<div style="position: fixed; bottom: 10px; right: 10px; background: #f3f4f6; padding: 8px; border-radius: 4px; z-index: 50;">PHP Version: ' . phpversion() . '</div>';
 // Check if user is logged in and is a baker
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'baker') {
     header("Location: login.html");

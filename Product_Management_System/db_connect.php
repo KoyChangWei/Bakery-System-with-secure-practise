@@ -1,8 +1,8 @@
 <?php
-$servername = "localhost:3308";
+$servername = "localhost:3307";
 $username = "root";
 $password = "";
-$dbname = "bakery_db";
+$dbname = "bakery_db(4)";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
